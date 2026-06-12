@@ -1,0 +1,66 @@
+package com.example.focusbuddyapp.data.preferences
+
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "focusbuddy_prefs")
+
+class UserPreferences(private val context: Context) {
+
+    companion object {
+        val AUTH_TOKEN     = stringPreferencesKey("auth_token")
+        val USER_ID        = intPreferencesKey("user_id")
+        val USER_NAME      = stringPreferencesKey("user_name")
+        val USER_EMAIL     = stringPreferencesKey("user_email")
+        val POMODORO_MIN   = intPreferencesKey("pomodoro_minutes")
+        val BREAK_MIN      = intPreferencesKey("break_minutes")
+        val NOTIF_ENABLED  = booleanPreferencesKey("notifications_enabled")
+    }
+
+    // Auth token
+    val authToken: Flow<String?> = context.dataStore.data.map { it[AUTH_TOKEN] }
+    fun getAuthTokenBlocking(): String? = runCatching {
+        runBlocking {
+            context.dataStore.data.map { it[AUTH_TOKEN] }.firstOrNull()
+        }
+    }.getOrNull()
+
+    val userId: Flow<Int> = context.dataStore.data.map { it[USER_ID] ?: 0 }
+    val userName: Flow<String> = context.dataStore.data.map { it[USER_NAME] ?: "" }
+    val pomodoroMinutes: Flow<Int> = context.dataStore.data.map { it[POMODORO_MIN] ?: 25 }
+    val breakMinutes: Flow<Int> = context.dataStore.data.map { it[BREAK_MIN] ?: 5 }
+    val notificationsEnabled: Flow<Boolean> = context.dataStore.data.map { it[NOTIF_ENABLED] ?: true }
+
+    suspend fun saveAuthToken(token: String) {
+        context.dataStore.edit { it[AUTH_TOKEN] = token }
+    }
+
+    suspend fun saveUserInfo(id: Int, name: String, email: String) {
+        context.dataStore.edit {
+            it[USER_ID]    = id
+            it[USER_NAME]  = name
+            it[USER_EMAIL] = email
+        }
+    }
+
+    suspend fun saveFocusSettings(pomodoroMin: Int, breakMin: Int) {
+        context.dataStore.edit {
+            it[POMODORO_MIN] = pomodoroMin
+            it[BREAK_MIN]    = breakMin
+        }
+    }
+
+    suspend fun saveNotificationEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[NOTIF_ENABLED] = enabled }
+    }
+
+    suspend fun clearAll() {
+        context.dataStore.edit { it.clear() }
+    }
+}
