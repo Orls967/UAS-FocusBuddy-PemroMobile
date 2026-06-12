@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FocusBuddy Splash</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Typography Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&amp;family=Hanken+Grotesk:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-dim": "#cbdbf5",
+            "inverse-surface": "#213145",
+            "on-secondary-fixed-variant": "#494640",
+            "background": "#f8f9ff",
+            "on-tertiary-fixed": "#410004",
+            "surface-container-high": "#dce9ff",
+            "secondary-fixed": "#e7e2d9",
+            "secondary-container": "#e7e2d9",
+            "surface-bright": "#f8f9ff",
+            "outline-variant": "#c3c6ce",
+            "on-primary-fixed-variant": "#2a4968",
+            "tertiary-container": "#701617",
+            "outline": "#73777e",
+            "primary": "#002542",
+            "on-background": "#0b1c30",
+            "on-tertiary": "#ffffff",
+            "on-error": "#ffffff",
+            "on-secondary": "#ffffff",
+            "inverse-on-surface": "#eaf1ff",
+            "surface-container": "#e5eeff",
+            "on-primary": "#ffffff",
+            "on-tertiary-container": "#fa7d75",
+            "error-container": "#ffdad6",
+            "surface-tint": "#436182",
+            "on-error-container": "#93000a",
+            "tertiary-fixed-dim": "#ffb3ad",
+            "surface-container-highest": "#d3e4fe",
+            "inverse-primary": "#abc9ef",
+            "tertiary": "#500006",
+            "on-surface": "#0b1c30",
+            "on-primary-fixed": "#001d35",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed": "#d1e4ff",
+            "on-secondary-container": "#67645d",
+            "surface": "#f8f9ff",
+            "error": "#ba1a1a",
+            "on-secondary-fixed": "#1d1b16",
+            "surface-container-low": "#eff4ff",
+            "secondary-fixed-dim": "#cbc6bd",
+            "on-surface-variant": "#43474d",
+            "on-tertiary-fixed-variant": "#832423",
+            "primary-fixed-dim": "#abc9ef",
+            "surface-variant": "#d3e4fe",
+            "on-primary-container": "#87a5ca",
+            "primary-container": "#1b3b5a",
+            "secondary": "#615e57",
+            "tertiary-fixed": "#ffdad7"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "base": "8px",
+            "margin-desktop": "64px",
+            "stack-gap": "12px",
+            "container-padding": "24px",
+            "margin-mobile": "20px",
+            "gutter": "16px"
+          },
+          "fontFamily": {
+            "headline-lg-mobile": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "label-lg": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "body-md": ["Hanken Grotesk"],
+            "body-lg": ["Hanken Grotesk"],
+            "headline-lg": ["Manrope"]
+          },
+          "fontSize": {
+            "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "800" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      100% { transform: scale(1.2); opacity: 0; }
+    }
+    
+    .ripple-effect::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 9999px;
+      border: 2px solid #abc9ef;
+      animation: pulse-ring 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+
+    .fade-in-up {
+      animation: fadeInUp 1s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    body {
+      background-color: #1b3b5a; /* primary-container fallback */
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-content items-center justify-center min-h-screen overflow-hidden selection:bg-secondary-fixed selection:text-primary">
+<!-- Background Decorative Ambient Shaders -->
+<div class="fixed inset-0 z-0 opacity-20 pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-surface-tint rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-on-primary-container rounded-full blur-[120px]"></div>
+</div>
+<!-- Main Canvas Container -->
+<main class="relative z-10 flex flex-col items-center justify-center w-full max-w-md px-margin-mobile text-center">
+<!-- Logo Section (Translating Image Design to Modern UI) -->
+<div class="relative mb-stack-gap md:mb-gutter flex items-center justify-center ripple-effect fade-in-up" style="animation-delay: 0.1s;">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-primary-container flex items-center justify-center border-4 border-outline-variant/20 shadow-2xl">
+<!-- Minimalist Central Logo Representation -->
+<div class="relative w-20 h-20 md:w-24 md:h-24 bg-secondary-container rounded-full flex items-center justify-center">
+<div class="absolute -top-4 w-10 h-10 bg-secondary-container rounded-full shadow-sm"></div>
+<div class="absolute -bottom-4 w-10 h-10 bg-secondary-container rounded-full shadow-sm"></div>
+<div class="absolute -left-4 w-10 h-10 bg-secondary-container rounded-full shadow-sm"></div>
+<div class="absolute -right-4 w-10 h-10 bg-secondary-container rounded-full shadow-sm"></div>
+<span class="material-symbols-outlined text-primary text-5xl md:text-6xl" style="font-variation-settings: 'FILL' 1;">
+            track_changes
+          </span>
+</div>
+</div>
+</div>
+<!-- Branding Content -->
+<div class="space-y-2 fade-in-up" style="animation-delay: 0.4s;">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-secondary-fixed tracking-tight">
+        FocusBuddy
+      </h1>
+<p class="font-body-md text-body-md md:font-body-lg md:text-body-lg text-secondary-fixed-dim/80">
+        Stay Focused, Stay Productive
+      </p>
+</div>
+<!-- Loading / Progress Indicator (Jetpack Compose Style) -->
+<div class="mt-margin-desktop w-full max-w-[200px] flex flex-col items-center gap-4 fade-in-up" style="animation-delay: 0.7s;">
+<div class="w-full h-1.5 bg-on-primary-container/20 rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed transition-all duration-300 ease-out" id="loading-bar" style="width: 0%;"></div>
+</div>
+<span class="font-label-md text-label-md text-outline-variant uppercase tracking-widest opacity-60">Initializing</span>
+</div>
+</main>
+<!-- Navigation Shell (Suppressed based on Transactional/Splash Rule) -->
+<!-- No BottomNavBar or TopAppBar for this view per Design System hierarchy rules -->
+<!-- Interaction & Animation Logic -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const bar = document.getElementById('loading-bar');
+      let progress = 0;
+      
+      const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        bar.style.width = `${progress}%`;
+        
+        if (progress === 100) {
+          clearInterval(interval);
+          // Potential redirect or next-state logic here
+          console.log("App ready for focus session.");
+        }
+      }, 300);
+
+      // Micro-interaction for logo on click
+      const logo = document.querySelector('.ripple-effect');
+      logo.addEventListener('click', () => {
+        logo.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          logo.style.transform = 'scale(1)';
+        }, 150);
+      });
+    });
+  </script>
+<!-- Illustration Placeholder (Ambient Focus Concept) -->
+<div class="fixed bottom-0 left-0 w-full h-1/4 opacity-10 mix-blend-overlay pointer-events-none">
+<img class="w-full h-full object-cover" data-alt="A serene minimalist home office setup with soft morning light streaming through a window onto a clean desk with a simple lamp and notebook. The atmosphere is calm and productive, using a palette of deep blues and warm cream tones to match the FocusBuddy brand identity. High-quality photographic style focusing on clean lines and negative space." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC02UE-d_iFRzGeq-h4Q5jHM0LdDEtPLjoAuGIbbKnvrB5Pcn9tw2_5_skn4dea_JQD-QllR3G_4kOl8Fidy65Lo52XxTJpOGUpq41eTsSZItvPJhG-Zsgo0zdDcuH-CS6yhjILbUH5ZJ3-LX7xjXfbt7C0ybLph49eKEIQIBdue2XSTCwF66I3lj48bQK1jK2XkQA-FpG78i3Xtb8nA3Lo0LNry9Lh3h76cbpceiCv69UJT7xj9zi6ShxlcI4WLw2NKWfakyuw9r2-"/>
+</div>
+</body></html>

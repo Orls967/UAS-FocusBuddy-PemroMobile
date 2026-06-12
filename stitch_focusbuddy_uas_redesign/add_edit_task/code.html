@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;family=Hanken+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#cbdbf5",
+                    "inverse-surface": "#213145",
+                    "on-secondary-fixed-variant": "#494640",
+                    "background": "#f8f9ff",
+                    "on-tertiary-fixed": "#410004",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-fixed": "#e7e2d9",
+                    "secondary-container": "#e7e2d9",
+                    "surface-bright": "#f8f9ff",
+                    "outline-variant": "#c3c6ce",
+                    "on-primary-fixed-variant": "#2a4968",
+                    "tertiary-container": "#701617",
+                    "outline": "#73777e",
+                    "primary": "#002542",
+                    "on-background": "#0b1c30",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "surface-container": "#e5eeff",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-container": "#fa7d75",
+                    "error-container": "#ffdad6",
+                    "surface-tint": "#436182",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "surface-container-highest": "#d3e4fe",
+                    "inverse-primary": "#abc9ef",
+                    "tertiary": "#500006",
+                    "on-surface": "#0b1c30",
+                    "on-primary-fixed": "#001d35",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed": "#d1e4ff",
+                    "on-secondary-container": "#67645d",
+                    "surface": "#f8f9ff",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed": "#1d1b16",
+                    "surface-container-low": "#eff4ff",
+                    "secondary-fixed-dim": "#cbc6bd",
+                    "on-surface-variant": "#43474d",
+                    "on-tertiary-fixed-variant": "#832423",
+                    "primary-fixed-dim": "#abc9ef",
+                    "surface-variant": "#d3e4fe",
+                    "on-primary-container": "#87a5ca",
+                    "primary-container": "#1b3b5a",
+                    "secondary": "#615e57",
+                    "tertiary-fixed": "#ffdad7"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "margin-desktop": "64px",
+                    "stack-gap": "12px",
+                    "container-padding": "24px",
+                    "margin-mobile": "20px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Manrope"],
+                    "headline-sm": ["Manrope"],
+                    "headline-md": ["Manrope"],
+                    "label-lg": ["JetBrains Mono"],
+                    "label-md": ["JetBrains Mono"],
+                    "body-md": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "headline-lg": ["Manrope"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "800"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #f8f9ff; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-shadow {
+            shadow: 0 4px 12px rgba(27, 59, 90, 0.05);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #002542 !important;
+            box-shadow: 0 0 0 2px rgba(0, 37, 66, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface">
+<!-- Top AppBar (from JSON) - Filtered to keep focus on task creation -->
+<header class="w-full top-0 bg-background flex justify-between items-center px-margin-mobile py-base sticky z-40">
+<button class="active:scale-95 transition-transform duration-200 flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary">New Task</h1>
+<div class="w-8"></div> <!-- Spacer for balance -->
+</header>
+<main class="max-w-2xl mx-auto px-margin-mobile pt-gutter pb-32">
+<div class="bg-surface-container-lowest rounded-[24px] p-container-padding shadow-[0_4px_12px_rgba(27,59,90,0.05)] border-l-4 border-primary">
+<form class="flex flex-col gap-gutter" id="task-form">
+<!-- Task Title Input -->
+<div class="flex flex-col gap-base">
+<label class="font-label-lg text-label-lg text-on-surface-variant px-1" for="task-title">Task Title</label>
+<input class="w-full bg-surface-container-low border-1.5 border-outline-variant rounded-xl px-4 py-3 font-body-lg text-body-lg text-on-background focus:bg-surface-container-lowest transition-all" id="task-title" placeholder="e.g., Advanced Microeconomics Research" required="" type="text"/>
+</div>
+<!-- Category & Due Date Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="flex flex-col gap-base">
+<label class="font-label-lg text-label-lg text-on-surface-variant px-1" for="task-category">Category</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-low border-1.5 border-outline-variant rounded-xl px-4 py-3 font-body-md text-body-md text-on-background focus:bg-surface-container-lowest transition-all pr-10" id="task-category">
+<option value="academic">Academic Focus</option>
+<option value="research">Library Research</option>
+<option value="exam">Exam Preparation</option>
+<option value="seminar">Seminar Prep</option>
+<option value="extracurricular">Extracurricular</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-lg text-label-lg text-on-surface-variant px-1" for="task-date">Due Date</label>
+<input class="w-full bg-surface-container-low border-1.5 border-outline-variant rounded-xl px-4 py-3 font-body-md text-body-md text-on-background focus:bg-surface-container-lowest transition-all" id="task-date" type="date"/>
+</div>
+</div>
+<!-- Priority Selection (Chips) -->
+<div class="flex flex-col gap-base">
+<label class="font-label-lg text-label-lg text-on-surface-variant px-1">Priority Level</label>
+<div class="flex flex-wrap gap-stack-gap">
+<label class="cursor-pointer">
+<input class="hidden peer" name="priority" type="radio" value="high"/>
+<div class="px-5 py-2 rounded-full border-1.5 border-outline-variant text-on-surface-variant font-label-md text-label-md peer-checked:bg-tertiary-fixed peer-checked:text-on-tertiary-fixed-variant peer-checked:border-tertiary transition-all">
+                                High
+                            </div>
+</label>
+<label class="cursor-pointer">
+<input checked="" class="hidden peer" name="priority" type="radio" value="medium"/>
+<div class="px-5 py-2 rounded-full border-1.5 border-outline-variant text-on-surface-variant font-label-md text-label-md peer-checked:bg-secondary-container peer-checked:text-on-secondary-container peer-checked:border-secondary transition-all">
+                                Medium
+                            </div>
+</label>
+<label class="cursor-pointer">
+<input class="hidden peer" name="priority" type="radio" value="low"/>
+<div class="px-5 py-2 rounded-full border-1.5 border-outline-variant text-on-surface-variant font-label-md text-label-md peer-checked:bg-surface-container-high peer-checked:text-primary peer-checked:border-primary transition-all">
+                                Low
+                            </div>
+</label>
+</div>
+</div>
+<!-- Notes / Additional Context -->
+<div class="flex flex-col gap-base">
+<label class="font-label-lg text-label-lg text-on-surface-variant px-1" for="task-notes">Study Notes</label>
+<textarea class="w-full bg-surface-container-low border-1.5 border-outline-variant rounded-xl px-4 py-3 font-body-md text-body-md text-on-background focus:bg-surface-container-lowest transition-all resize-none" id="task-notes" placeholder="List specific resources or sub-tasks here..." rows="4"></textarea>
+</div>
+</form>
+</div>
+<!-- Atmospheric Visual Element -->
+<div class="mt-gutter grid grid-cols-2 gap-gutter">
+<div class="relative overflow-hidden rounded-[24px] h-32 group">
+<img class="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-700" data-alt="A clean, minimalist workspace featuring a stack of academic textbooks, a sophisticated navy fountain pen, and a warm ceramic mug of coffee. The lighting is soft morning light streaming through a library window, creating a focused and studious atmosphere in a corporate-modern style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoGyj0MFBOYYsSDT-4-x-SNSe1RuUCk8zyWw7qiLbCOlbjQkCEzys2qJYr_g173lPg21Gt0m7JPE31XUZ1AVlSPSW6FmSoaYqAPvl6AjL8J2jPVeUBlq84WBp1MwGPq4r03kL2GfWSnfKtJB6UxmMy8KGwxEkgjOidKwHw4pZs6OSexpmaUHsx7-baTWbsgisP_AwpgWf5-GsMOlaTuoHPIyC_W1iQpz4R3ay81MBy8d7MDo-tfKrqJjNqPbc6DZLHdYXH-bvvhwks"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent flex items-end p-4">
+<span class="font-label-md text-label-md text-white">Focus Zone</span>
+</div>
+</div>
+<div class="bg-surface-container-high rounded-[24px] p-container-padding flex flex-col justify-center items-center text-center">
+<span class="material-symbols-outlined text-primary text-4xl mb-2">auto_awesome</span>
+<p class="font-label-md text-label-md text-on-primary-container">"Every task completed is one step closer to academic mastery."</p>
+</div>
+</div>
+</main>
+<!-- Fixed Action Bar -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest/80 backdrop-blur-md px-margin-mobile py-gutter flex justify-center z-50">
+<div class="max-w-2xl w-full flex gap-gutter">
+<button class="flex-1 bg-primary text-on-primary font-headline-sm text-headline-sm py-3.5 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">save</span>
+                Save Task
+            </button>
+</div>
+</div>
+<!-- Background Decoration -->
+<div class="fixed inset-0 -z-10 opacity-30 pointer-events-none overflow-hidden">
+<div class="absolute -top-[10%] -left-[5%] w-1/2 h-1/2 bg-surface-dim blur-[120px] rounded-full"></div>
+<div class="absolute -bottom-[10%] -right-[5%] w-1/3 h-1/3 bg-primary-fixed-dim blur-[100px] rounded-full"></div>
+</div>
+<script>
+        // Simple Interaction logic
+        const form = document.getElementById('task-form');
+        const saveBtn = document.querySelector('button.bg-primary');
+
+        saveBtn.addEventListener('click', (e) => {
+            const title = document.getElementById('task-title').value;
+            if(!title) {
+                document.getElementById('task-title').classList.add('border-error');
+                setTimeout(() => {
+                    document.getElementById('task-title').classList.remove('border-error');
+                }, 2000);
+                return;
+            }
+            
+            saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Saving...';
+            saveBtn.disabled = true;
+            
+            setTimeout(() => {
+                saveBtn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Success';
+                saveBtn.classList.remove('bg-primary');
+                saveBtn.classList.add('bg-green-700');
+                
+                setTimeout(() => {
+                    // Simulation complete
+                    window.history.back();
+                }, 1000);
+            }, 1200);
+        });
+
+        // Soft ripple-like effect on chips
+        document.querySelectorAll('input[name="priority"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const parent = radio.closest('.cursor-pointer');
+                parent.style.transform = 'scale(0.95)';
+                setTimeout(() => parent.style.transform = 'scale(1)', 100);
+            });
+        });
+    </script>
+</body></html>

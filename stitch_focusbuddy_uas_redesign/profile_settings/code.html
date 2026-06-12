@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Profile &amp; Settings | Cognitive Clarity</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;family=Hanken+Grotesk:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#cbdbf5",
+                        "inverse-surface": "#213145",
+                        "on-secondary-fixed-variant": "#494640",
+                        "background": "#f8f9ff",
+                        "on-tertiary-fixed": "#410004",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-fixed": "#e7e2d9",
+                        "secondary-container": "#e7e2d9",
+                        "surface-bright": "#f8f9ff",
+                        "outline-variant": "#c3c6ce",
+                        "on-primary-fixed-variant": "#2a4968",
+                        "tertiary-container": "#701617",
+                        "outline": "#73777e",
+                        "primary": "#002542",
+                        "on-background": "#0b1c30",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container": "#e5eeff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#fa7d75",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#436182",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-primary": "#abc9ef",
+                        "tertiary": "#500006",
+                        "on-surface": "#0b1c30",
+                        "on-primary-fixed": "#001d35",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#d1e4ff",
+                        "on-secondary-container": "#67645d",
+                        "surface": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#1d1b16",
+                        "surface-container-low": "#eff4ff",
+                        "secondary-fixed-dim": "#cbc6bd",
+                        "on-surface-variant": "#43474d",
+                        "on-tertiary-fixed-variant": "#832423",
+                        "primary-fixed-dim": "#abc9ef",
+                        "surface-variant": "#d3e4fe",
+                        "on-primary-container": "#87a5ca",
+                        "primary-container": "#1b3b5a",
+                        "secondary": "#615e57",
+                        "tertiary-fixed": "#ffdad7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-desktop": "64px",
+                        "stack-gap": "12px",
+                        "container-padding": "24px",
+                        "margin-mobile": "20px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Manrope"],
+                        "headline-sm": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "label-lg": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-md": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "800"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f8f9ff;
+            color: #0b1c30;
+            -webkit-font-smoothing: antialiased;
+        }
+        .canvas-card {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(27, 59, 90, 0.05);
+        }
+        .glass-header {
+            backdrop-filter: blur(8px);
+            background: rgba(248, 249, 255, 0.8);
+        }
+        .setting-item:active {
+            transform: scale(0.98);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md mb-24 md:mb-0">
+<!-- Top AppBar -->
+<nav class="sticky top-0 z-50 glass-header flex justify-between items-center px-margin-mobile py-base w-full">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200">arrow_back</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Profile &amp; Settings</h1>
+</div>
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200">settings</button>
+</nav>
+<main class="max-w-xl mx-auto px-margin-mobile mt-gutter space-y-gutter">
+<!-- Profile Header Section -->
+<section class="canvas-card p-container-padding text-center">
+<div class="relative w-32 h-32 mx-auto mb-4">
+<img alt="User Profile" class="w-full h-full rounded-full object-cover border-4 border-surface-container shadow-sm" data-alt="A professional studio portrait of a university student with a confident, friendly expression. The lighting is soft and high-key, matching a clean academic light-mode aesthetic. The background is a soft, out-of-focus cream color that complements the navy and white UI theme. The overall mood is scholarly, focused, and trustworthy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNzqFUFjavzv6lv3n5O67zgeEcQDY_4jg7LDBH2ll8F5M_37NQhML90bkGc69dbEy_03LQuOuLPNQjDj2uHRetzQo27qhR5-z_73n7JNx8uTNMQCYxGu02wyIwIZzerbmEsPz0jJ3FtBRCMgK5rr0toCGqLMdwt3otsCovUnI-q-xvVwjciKPUWLm1RiYAQJsjWtq7b2lUD09ARHqZl5uexqDZktM4Dpx0S7Sj6P_X7ZyfGbQIPO_bSCD_n21s1Do24RIIJLHdf13b"/>
+<button class="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg hover:opacity-90 active:scale-90 transition-all">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-background">Alex Henderson</h2>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-1">Computer Science Major</p>
+</section>
+<!-- Account Info Card -->
+<section class="canvas-card p-container-padding space-y-stack-gap">
+<h3 class="font-label-lg text-label-lg text-primary uppercase border-b border-surface-container pb-2 mb-4">Account Information</h3>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low border border-outline-variant/10 group hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">mail</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Primary Email</p>
+<p class="font-body-md text-body-md font-semibold">a.henderson@university.edu</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low border border-outline-variant/10 group hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">lock</span>
+<p class="font-body-md text-body-md font-semibold">Change Password</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</section>
+<!-- Preferences Grid -->
+<section class="space-y-stack-gap">
+<h3 class="font-label-lg text-label-lg text-primary uppercase px-1">Application Preferences</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-gap">
+<!-- Focus Settings -->
+<div class="canvas-card p-container-padding border-l-4 border-primary hover:shadow-md transition-shadow cursor-pointer setting-item">
+<span class="material-symbols-outlined text-primary mb-2" data-weight="fill">timer</span>
+<h4 class="font-headline-sm text-headline-sm text-on-background">Focus Settings</h4>
+<p class="text-on-surface-variant text-[14px] mt-1">Configure your Pomodoro intervals and deep-work modes.</p>
+</div>
+<!-- Notification Settings -->
+<div class="canvas-card p-container-padding hover:shadow-md transition-shadow cursor-pointer setting-item">
+<span class="material-symbols-outlined text-primary mb-2">notifications</span>
+<h4 class="font-headline-sm text-headline-sm text-on-background">Notifications</h4>
+<p class="text-on-surface-variant text-[14px] mt-1">Manage reminders, daily summaries, and task alerts.</p>
+</div>
+<!-- Appearance -->
+<div class="canvas-card p-container-padding hover:shadow-md transition-shadow cursor-pointer setting-item">
+<span class="material-symbols-outlined text-primary mb-2">palette</span>
+<h4 class="font-headline-sm text-headline-sm text-on-background">Appearance</h4>
+<p class="text-on-surface-variant text-[14px] mt-1">Customize theme colors, font sizes, and dark mode.</p>
+</div>
+<!-- Data & Privacy -->
+<div class="canvas-card p-container-padding hover:shadow-md transition-shadow cursor-pointer setting-item">
+<span class="material-symbols-outlined text-primary mb-2">security</span>
+<h4 class="font-headline-sm text-headline-sm text-on-background">Data &amp; Privacy</h4>
+<p class="text-on-surface-variant text-[14px] mt-1">Manage your cloud sync and exported study logs.</p>
+</div>
+</div>
+</section>
+<!-- Dangerous Actions -->
+<section class="space-y-stack-gap pb-12">
+<button class="w-full bg-primary text-white h-[48px] rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined">logout</span>
+                Sign Out
+            </button>
+<button class="w-full bg-transparent border-1.5 border-outline-variant/30 text-on-tertiary-fixed-variant h-[48px] rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-tertiary-fixed/10 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-error">delete_forever</span>
+<span class="text-error">Deactivate Account</span>
+</button>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<div class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center px-2 py-3 bg-surface-container-lowest shadow-[0_-4px_12px_rgba(27,59,90,0.05)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1 hover:bg-surface-container-high transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1 hover:bg-surface-container-high transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md text-label-md">Tasks</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1 hover:bg-surface-container-high transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-label-md text-label-md">Timer</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1 hover:bg-surface-container-high transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-label-md text-label-md">Progress</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</div>
+<!-- Background Subtle Glow Effect -->
+<div class="fixed top-0 right-0 -z-10 w-64 h-64 bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="fixed bottom-0 left-0 -z-10 w-96 h-96 bg-primary-container/5 blur-[150px] rounded-full"></div>
+<script>
+        // Simple interaction for settings items
+        document.querySelectorAll('.setting-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const title = item.querySelector('h4').textContent;
+                console.log(`Navigating to ${title}...`);
+                // Add temporary highlight effect
+                item.classList.add('ring-2', 'ring-primary/20');
+                setTimeout(() => item.classList.remove('ring-2', 'ring-primary/20'), 400);
+            });
+        });
+    </script>
+</body></html>

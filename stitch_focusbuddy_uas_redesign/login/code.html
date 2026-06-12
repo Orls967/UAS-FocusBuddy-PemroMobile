@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FocusBuddy - Welcome Back</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Hanken+Grotesk:wght@400;500&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=JetBrains+Mono:wght@100..900&family=Manrope:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "surface-dim": "#cbdbf5",
+                  "inverse-surface": "#213145",
+                  "on-secondary-fixed-variant": "#494640",
+                  "background": "#f8f9ff",
+                  "on-tertiary-fixed": "#410004",
+                  "surface-container-high": "#dce9ff",
+                  "secondary-fixed": "#e7e2d9",
+                  "secondary-container": "#e7e2d9",
+                  "surface-bright": "#f8f9ff",
+                  "outline-variant": "#c3c6ce",
+                  "on-primary-fixed-variant": "#2a4968",
+                  "tertiary-container": "#701617",
+                  "outline": "#73777e",
+                  "primary": "#002542",
+                  "on-background": "#0b1c30",
+                  "on-tertiary": "#ffffff",
+                  "on-error": "#ffffff",
+                  "on-secondary": "#ffffff",
+                  "inverse-on-surface": "#eaf1ff",
+                  "surface-container": "#e5eeff",
+                  "on-primary": "#ffffff",
+                  "on-tertiary-container": "#fa7d75",
+                  "error-container": "#ffdad6",
+                  "surface-tint": "#436182",
+                  "on-error-container": "#93000a",
+                  "tertiary-fixed-dim": "#ffb3ad",
+                  "surface-container-highest": "#d3e4fe",
+                  "inverse-primary": "#abc9ef",
+                  "tertiary": "#500006",
+                  "on-surface": "#0b1c30",
+                  "on-primary-fixed": "#001d35",
+                  "surface-container-lowest": "#ffffff",
+                  "primary-fixed": "#d1e4ff",
+                  "on-secondary-container": "#67645d",
+                  "surface": "#f8f9ff",
+                  "error": "#ba1a1a",
+                  "on-secondary-fixed": "#1d1b16",
+                  "surface-container-low": "#eff4ff",
+                  "secondary-fixed-dim": "#cbc6bd",
+                  "on-surface-variant": "#43474d",
+                  "on-tertiary-fixed-variant": "#832423",
+                  "primary-fixed-dim": "#abc9ef",
+                  "surface-variant": "#d3e4fe",
+                  "on-primary-container": "#87a5ca",
+                  "primary-container": "#1b3b5a",
+                  "secondary": "#615e57",
+                  "tertiary-fixed": "#ffdad7"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "base": "8px",
+                  "margin-desktop": "64px",
+                  "stack-gap": "12px",
+                  "container-padding": "24px",
+                  "margin-mobile": "20px",
+                  "gutter": "16px"
+          },
+          "fontFamily": {
+                  "headline-lg-mobile": ["Manrope"],
+                  "headline-sm": ["Manrope"],
+                  "headline-md": ["Manrope"],
+                  "label-lg": ["JetBrains Mono"],
+                  "label-md": ["JetBrains Mono"],
+                  "body-md": ["Hanken Grotesk"],
+                  "body-lg": ["Hanken Grotesk"],
+                  "headline-lg": ["Manrope"]
+          },
+          "fontSize": {
+                  "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "800" }],
+                  "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                  "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                  "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                  "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                  "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                  "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                  "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #f8f9ff;
+      color: #0b1c30;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .focus-card {
+      box-shadow: 0 4px 12px rgba(27, 59, 90, 0.05);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+
+    .focus-card:hover {
+      box-shadow: 0 12px 32px rgba(27, 59, 90, 0.08);
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .input-transition {
+      transition: all 0.2s ease-in-out;
+    }
+
+    .shimmer-effect {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite linear;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen">
+<main class="flex-grow flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-12 relative overflow-hidden">
+<div class="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-surface-container opacity-40 blur-3xl"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-primary-fixed opacity-30 blur-3xl"></div>
+<div class="w-full max-w-[440px] z-10">
+<div class="flex flex-col items-center mb-10">
+<div class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mb-6 shadow-lg">
+<span class="material-symbols-outlined text-white text-4xl" data-icon="school">school</span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2 text-center">
+          Welcome Back
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant text-center px-8">
+          Ready to dive back into your focus session, Scholar?
+        </p>
+</div>
+<div class="bg-surface-container-lowest focus-card rounded-[24px] p-8 md:p-10 border border-outline-variant/10">
+<form class="space-y-gutter">
+<div class="space-y-2">
+<label class="font-label-lg text-label-lg text-on-surface-variant ml-1" for="email">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60">mail</span>
+<input class="w-full h-14 pl-12 pr-4 bg-[#F5EFE6]/40 border-[1.5px] border-outline-variant/30 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary input-transition font-body-md text-body-md text-on-surface placeholder:text-outline/60" id="email" placeholder="name@university.edu" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-lg text-label-lg text-on-surface-variant ml-1" for="password">Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60">lock</span>
+<input class="w-full h-14 pl-12 pr-12 bg-[#F5EFE6]/40 border-[1.5px] border-outline-variant/30 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary input-transition font-body-md text-body-md text-on-surface placeholder:text-outline/60" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60 hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between text-label-md font-label-md pt-2">
+<label class="flex items-center space-x-2 cursor-pointer group">
+<input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Keep me focused</span>
+</label>
+<a class="text-on-primary-container hover:underline decoration-2 underline-offset-4" href="#">Forgot Password?</a>
+</div>
+<button class="w-full h-14 bg-primary text-on-primary font-headline-sm text-headline-sm rounded-xl flex items-center justify-center gap-2 shadow-lg hover:bg-primary-container active:scale-95 transition-all duration-200 group" type="submit">
+            Login
+            <span class="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+</form>
+<div class="mt-8 flex flex-col items-center space-y-gutter">
+<div class="flex items-center w-full gap-4">
+<div class="h-[1px] bg-outline-variant/30 flex-grow"></div>
+<span class="font-label-md text-label-md text-outline">OR CONTINUE WITH</span>
+<div class="h-[1px] bg-outline-variant/30 flex-grow"></div>
+</div>
+<div class="grid grid-cols-2 gap-4 w-full">
+<button class="flex items-center justify-center h-12 rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors group">
+<img alt="Google Logo" class="w-5 h-5 mr-3 grayscale group-hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6bKJousYL259uQNK3C6MOaBLHmGFR7FNSTx42FEyVKuLnWasFFU7qrH2XjUKd48tZ9TgKphmNADTg-RjKxpvgI4deLMEZKcbzRYwlzmm7dCo2GeY0V3f3I6Pv3IYTmeFuSPbezizYg2qfIrWed8uxG8TBU37EzEMOiIzI7E4PHYSMZDqL738lQ6cUN7zrdVhkFF3LFPRHT6ZHlwKC2CkrNX6OCTM0ijxCru5AvSx2wtq2D-KJHTaA8E5Kqr3srgMI4eMO3Qw-YsNC"/>
+<span class="font-label-md text-label-md text-on-surface">Google</span>
+</button>
+<button class="flex items-center justify-center h-12 rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors group">
+<span class="material-symbols-outlined mr-3 text-on-surface-variant group-hover:text-on-surface transition-all">terminal</span>
+<span class="font-label-md text-label-md text-on-surface">Campus SSO</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant pt-2">
+            Don't have an account? 
+            <a class="text-on-primary-container font-semibold hover:underline decoration-2 underline-offset-4" href="#">Sign Up!</a>
+</p>
+</div>
+</div>
+<div class="mt-12 flex justify-center space-x-gutter">
+<div class="flex flex-col items-center opacity-60">
+<div class="flex space-x-1 mb-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-label-md text-label-md text-primary">Trusted by 50k+ Scholars</p>
+</div>
+</div>
+</div>
+<div class="fixed bottom-0 left-0 w-full p-gutter pointer-events-none opacity-20">
+<div class="grid grid-cols-3 gap-12 w-full max-w-[1200px] mx-auto overflow-hidden">
+<div class="h-40 rounded-3xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-primary/10">timer</span>
+</div>
+<div class="h-40 rounded-3xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-primary/10">auto_stories</span>
+</div>
+<div class="h-40 rounded-3xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-primary/10">psychology</span>
+</div>
+</div>
+</div>
+</main>
+<footer class="py-base text-center w-full z-20">
+<div class="flex justify-center space-x-gutter mb-base opacity-40">
+<a class="font-label-md text-label-md text-on-surface hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<span class="text-outline">•</span>
+<a class="font-label-md text-label-md text-on-surface hover:text-primary transition-colors" href="#">Terms of Focus</a>
+<span class="text-outline">•</span>
+<a class="font-label-md text-label-md text-on-surface hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</footer>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputs = document.querySelectorAll('input');
+      
+      inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+          input.parentElement.parentElement.classList.add('scale-[1.02]');
+        });
+        
+        input.addEventListener('blur', () => {
+          input.parentElement.parentElement.classList.remove('scale-[1.02]');
+        });
+      });
+
+      const loginBtn = document.querySelector('button[type="submit"]');
+      loginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginBtn.innerHTML = `
+          <div class="w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full animate-spin mr-2"></div>
+          Authenticating...
+        `;
+        setTimeout(() => {
+          loginBtn.innerHTML = `Login <span class="material-symbols-outlined text-xl">arrow_forward</span>`;
+        }, 2000);
+      });
+    });
+  </script>
+</body></html>
