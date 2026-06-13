@@ -1,2 +1,56 @@
-"package com.example.focusbuddyapp.presentation.task.detail\n\nimport androidx.lifecycle.ViewModel\nimport androidx.lifecycle.ViewModelProvider\nimport androidx.lifecycle.viewModelScope\nimport com.example.focusbuddyapp.di.AppModule\nimport com.example.focusbuddyapp.domain.model.Task\nimport kotlinx.coroutines.flow.MutableStateFlow\nimport kotlinx.coroutines.flow.StateFlow\nimport kotlinx.coroutines.flow.asStateFlow\nimport kotlinx.coroutines.flow.update\nimport kotlinx.coroutines.launch\n\ndata class TaskDetailUiState(\n    val task: Task? = null,\n    val isLoading: Boolean = true,\n    val errorMessage: String? = null,\n    val isDeleted: Boolean = false\n)\n\nclass TaskDetailViewModel(private val taskId: Int) : ViewModel() {\n    private val readTaskUseCase = AppModule.readTaskUseCase\n    private val deleteTaskUseCase = AppModule.deleteTaskUseCase\n    private val toggleTaskCompleteUseCase = AppModule.toggleTaskCompleteUseCase\n\n    private val _uiState = MutableStateFlow(TaskDetailUiState())\n    val uiState: StateFlow<TaskDetailUiState> = _uiState.asStateFlow()\n\n    init { loadTask() }\n\n    private fun loadTask() = viewModelScope.launch {\n        val task = readTaskUseCase(taskId)\n        _uiState.update {\n            if (task != null) it.copy(task = task, isLoading = false)\n            else it.copy(isLoading = false, errorMessage = \"Task tidak ditemukan\")\n        }\n    }\n\n    fun deleteTask() = viewModelScope.launch {\n        deleteTaskUseCase(taskId)\n        _uiState.update { it.copy(isDeleted = true) }\n    }\n\n    fun toggleComplete() = viewModelScope.launch {\n        val current = _uiState.value.task ?: return@launch\n        toggleTaskCompleteUseCase(taskId, !current.isCompleted)\n        _uiState.update { it.copy(task = current.copy(isCompleted = !current.isCompleted)) }\n    }\n}\n\nclass TaskDetailViewModelFactory(private val taskId: Int) : ViewModelProvider.Factory {\n    override fun <T : ViewModel> create(modelClass: Class<T>): T {\n        @Suppress(\"UNCHECKED_CAST\")\n    
-<truncated 56 bytes>
+package com.example.focusbuddyapp.presentation.task.detail
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.focusbuddyapp.di.AppModule
+import com.example.focusbuddyapp.domain.model.Task
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+data class TaskDetailUiState(
+    val task: Task? = null,
+    val isLoading: Boolean = true,
+    val errorMessage: String? = null,
+    val isDeleted: Boolean = false
+)
+
+class TaskDetailViewModel(private val taskId: Int) : ViewModel() {
+    private val readTaskUseCase = AppModule.readTaskUseCase
+    private val deleteTaskUseCase = AppModule.deleteTaskUseCase
+    private val toggleTaskCompleteUseCase = AppModule.toggleTaskCompleteUseCase
+
+    private val _uiState = MutableStateFlow(TaskDetailUiState())
+    val uiState: StateFlow<TaskDetailUiState> = _uiState.asStateFlow()
+
+    init { loadTask() }
+
+    private fun loadTask() = viewModelScope.launch {
+        val task = readTaskUseCase(taskId)
+        _uiState.update {
+            if (task != null) it.copy(task = task, isLoading = false)
+            else it.copy(isLoading = false, errorMessage = "Task tidak ditemukan")
+        }
+    }
+
+    fun deleteTask() = viewModelScope.launch {
+        deleteTaskUseCase(taskId)
+        _uiState.update { it.copy(isDeleted = true) }
+    }
+
+    fun toggleComplete() = viewModelScope.launch {
+        val current = _uiState.value.task ?: return@launch
+        toggleTaskCompleteUseCase(taskId, !current.isCompleted)
+        _uiState.update { it.copy(task = current.copy(isCompleted = !current.isCompleted)) }
+    }
+}
+
+class TaskDetailViewModelFactory(private val taskId: Int) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+        return TaskDetailViewModel(taskId) as T
+    }
+}

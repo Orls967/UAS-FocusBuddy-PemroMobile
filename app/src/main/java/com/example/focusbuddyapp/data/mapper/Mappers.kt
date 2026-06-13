@@ -7,6 +7,8 @@ import com.example.focusbuddyapp.data.local.entity.FocusSessionEntity
 import com.example.focusbuddyapp.data.remote.dto.*
 import com.example.focusbuddyapp.domain.model.*
 
+// ─── Entity → Domain ─────────────────────────────────────────────────────────
+
 fun UserEntity.toDomain() = User(
     id = id, name = name, email = email, major = major,
     avatarUrl = avatarUrl, createdAt = createdAt
@@ -32,6 +34,8 @@ fun FocusSessionEntity.toDomain() = FocusSession(
     breakDurationMinutes = breakDurationMinutes, remoteId = remoteId, syncedAt = syncedAt
 )
 
+// ─── Domain → Entity ─────────────────────────────────────────────────────────
+
 fun User.toEntity() = UserEntity(
     id = id, name = name, email = email, major = major,
     avatarUrl = avatarUrl, createdAt = createdAt
@@ -55,6 +59,8 @@ fun FocusSession.toEntity() = FocusSessionEntity(
     startTime = startTime, endTime = endTime, efficiencyPercent = efficiencyPercent,
     breakDurationMinutes = breakDurationMinutes, remoteId = remoteId, syncedAt = syncedAt
 )
+
+// ─── DTO → Domain ─────────────────────────────────────────────────────────────
 
 fun UserDto.toDomain() = User(
     id = 0, name = name, email = email,

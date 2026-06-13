@@ -1,2 +1,52 @@
-"package com.example.focusbuddyapp.presentation.auth.register\n\nimport androidx.lifecycle.ViewModel\nimport androidx.lifecycle.ViewModelProvider\nimport androidx.lifecycle.viewModelScope\nimport com.example.focusbuddyapp.di.AppModule\nimport kotlinx.coroutines.flow.MutableStateFlow\nimport kotlinx.coroutines.flow.StateFlow\nimport kotlinx.coroutines.flow.asStateFlow\nimport kotlinx.coroutines.flow.update\nimport kotlinx.coroutines.launch\n\ndata class RegisterUiState(\n    val name: String = \"\",\n    val email: String = \"\",\n    val password: String = \"\",\n    val confirmPassword: String = \"\",\n    val isPasswordVisible: Boolean = false,\n    val isLoading: Boolean = false,\n    val errorMessage: String? = null,\n    val isSuccess: Boolean = false\n)\n\nclass RegisterViewModel : ViewModel() {\n    private val registerUseCase = AppModule.registerUseCase\n\n    private val _uiState = MutableStateFlow(RegisterUiState())\n    val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()\n\n    fun onNameChange(v: String) = _uiState.update { it.copy(name = v, errorMessage = null) }\n    fun onEmailChange(v: String) = _uiState.update { it.copy(email = v, errorMessage = null) }\n    fun onPasswordChange(v: String) = _uiState.update { it.copy(password = v, errorMessage = null) }\n    fun onConfirmPasswordChange(v: String) = _uiState.update { it.copy(confirmPassword = v, errorMessage = null) }\n    fun togglePasswordVisibility() = _uiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }\n\n    fun register() = viewModelScope.launch {\n        val s = _uiState.value\n        _uiState.update { it.copy(isLoading = true, errorMessage = null) }\n        val result = registerUseCase(s.name, s.email, s.password, s.confirmPassword)\n        result.fold(\n            onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },\n            onFailure = { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }\n        )\n    }\n}\n\nclass RegisterViewModelFactor
-<truncated 192 bytes>
+package com.example.focusbuddyapp.presentation.auth.register
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.focusbuddyapp.di.AppModule
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+data class RegisterUiState(
+    val name: String = "",
+    val email: String = "",
+    val password: String = "",
+    val confirmPassword: String = "",
+    val isPasswordVisible: Boolean = false,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val isSuccess: Boolean = false
+)
+
+class RegisterViewModel : ViewModel() {
+    private val registerUseCase = AppModule.registerUseCase
+
+    private val _uiState = MutableStateFlow(RegisterUiState())
+    val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
+
+    fun onNameChange(v: String) = _uiState.update { it.copy(name = v, errorMessage = null) }
+    fun onEmailChange(v: String) = _uiState.update { it.copy(email = v, errorMessage = null) }
+    fun onPasswordChange(v: String) = _uiState.update { it.copy(password = v, errorMessage = null) }
+    fun onConfirmPasswordChange(v: String) = _uiState.update { it.copy(confirmPassword = v, errorMessage = null) }
+    fun togglePasswordVisibility() = _uiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+
+    fun register() = viewModelScope.launch {
+        val s = _uiState.value
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        val result = registerUseCase(s.name, s.email, s.password, s.confirmPassword)
+        result.fold(
+            onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },
+            onFailure = { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }
+        )
+    }
+}
+
+class RegisterViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+        return RegisterViewModel() as T
+    }
+}

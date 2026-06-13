@@ -1,2 +1,119 @@
-"package com.example.focusbuddyapp.presentation.splash\n\nimport androidx.compose.animation.core.*\nimport androidx.compose.foundation.background\nimport androidx.compose.foundation.layout.*\nimport androidx.compose.foundation.shape.CircleShape\nimport androidx.compose.material3.*\nimport androidx.compose.runtime.*\nimport androidx.compose.ui.Alignment\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.draw.clip\nimport androidx.compose.ui.draw.scale\nimport androidx.compose.ui.graphics.Brush\nimport androidx.compose.ui.graphics.Color\nimport androidx.compose.ui.text.font.FontWeight\nimport androidx.compose.ui.unit.dp\nimport androidx.compose.ui.unit.sp\nimport androidx.lifecycle.compose.collectAsStateWithLifecycle\nimport com.example.focusbuddyapp.ui.theme.DarkNavy\nimport com.example.focusbuddyapp.ui.theme.PrimaryNavy\nimport com.example.focusbuddyapp.ui.theme.WarmBackground\nimport com.example.focusbuddyapp.ui.theme.WarmBeige\n\n@Composable\nfun SplashScreen(\n    viewModel: SplashViewModel,\n    onNavigateToLogin: () -> Unit,\n    onNavigateToDashboard: () -> Unit\n) {\n    val uiState by viewModel.uiState.collectAsStateWithLifecycle()\n\n    // Pulse animation for logo\n    val infiniteTransition = rememberInfiniteTransition(label = \"splash_pulse\")\n    val logoScale by infiniteTransition.animateFloat(\n        initialValue = 0.95f,\n        targetValue = 1.05f,\n        animationSpec = infiniteRepeatable(\n            animation = tween(1000, easing = FastOutSlowInEasing),\n            repeatMode = RepeatMode.Reverse\n        ),\n        label = \"logo_scale\"\n    )\n\n    // Navigation effect\n    LaunchedEffect(uiState) {\n        when (uiState) {\n            SplashUiState.NavigateToLogin     -> onNavigateToLogin()\n            SplashUiState.NavigateToDashboard -> onNavigateToDashboard()\n            else -> Unit\n        }\n    }\n\n    Box(\n        modifier = Modifier\n            .fillMaxSize()\n            .background(\n                brush = Brush.verticalGradient(\n               
-<truncated 2069 bytes>
+package com.example.focusbuddyapp.presentation.splash
+
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.focusbuddyapp.ui.theme.DarkNavy
+import com.example.focusbuddyapp.ui.theme.PrimaryNavy
+import com.example.focusbuddyapp.ui.theme.WarmBackground
+import com.example.focusbuddyapp.ui.theme.WarmBeige
+
+@Composable
+fun SplashScreen(
+    viewModel: SplashViewModel,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToDashboard: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Pulse animation for logo
+    val infiniteTransition = rememberInfiniteTransition(label = "splash_pulse")
+    val logoScale by infiniteTransition.animateFloat(
+        initialValue = 0.95f,
+        targetValue = 1.05f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "logo_scale"
+    )
+
+    // Navigation effect
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            SplashUiState.NavigateToLogin     -> onNavigateToLogin()
+            SplashUiState.NavigateToDashboard -> onNavigateToDashboard()
+            else -> Unit
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(PrimaryNavy, DarkNavy)
+                )
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Logo circle
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .scale(logoScale)
+                    .clip(CircleShape)
+                    .background(WarmBeige.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "FB",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = WarmBeige,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            Text(
+                text = "FocusBuddy",
+                style = MaterialTheme.typography.displayLarge,
+                color = Color.White
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = "Stay Focused, Stay Productive",
+                style = MaterialTheme.typography.bodyLarge,
+                color = WarmBeige.copy(alpha = 0.7f)
+            )
+
+            Spacer(Modifier.height(64.dp))
+
+            // Progress indicator
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                LinearProgressIndicator(
+                    modifier = Modifier.width(160.dp),
+                    color = WarmBeige,
+                    trackColor = WarmBeige.copy(alpha = 0.25f)
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = "INITIALIZING",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = WarmBeige.copy(alpha = 0.5f),
+                    letterSpacing = 3.sp
+                )
+            }
+        }
+    }
+}

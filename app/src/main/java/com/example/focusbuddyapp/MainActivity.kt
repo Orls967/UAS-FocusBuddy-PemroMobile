@@ -1,1 +1,20 @@
-"package com.example.focusbuddyapp\n\nimport android.os.Bundle\nimport androidx.activity.ComponentActivity\nimport androidx.activity.compose.setContent\nimport androidx.activity.enableEdgeToEdge\nimport com.example.focusbuddyapp.presentation.navigation.NavGraph\nimport com.example.focusbuddyapp.ui.theme.FocusBuddyTheme\n\nclass MainActivity : ComponentActivity() {\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        enableEdgeToEdge()\n        setContent {\n            FocusBuddyTheme {\n                NavGraph()\n            }\n        }\n    }\n}\n"
+package com.example.focusbuddyapp
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import com.example.focusbuddyapp.presentation.navigation.NavGraph
+import com.example.focusbuddyapp.ui.theme.FocusBuddyTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            FocusBuddyTheme {
+                NavGraph()
+            }
+        }
+    }
+}

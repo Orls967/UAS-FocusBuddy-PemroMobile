@@ -2,6 +2,7 @@ package com.example.focusbuddyapp.data.repository
 
 import com.example.focusbuddyapp.data.local.dao.UserDao
 import com.example.focusbuddyapp.data.mapper.toDomain
+import com.example.focusbuddyapp.data.mapper.toEntity
 import com.example.focusbuddyapp.data.preferences.UserPreferences
 import com.example.focusbuddyapp.data.remote.api.AuthApiService
 import com.example.focusbuddyapp.domain.model.User

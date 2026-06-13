@@ -1,2 +1,146 @@
-"package com.example.focusbuddyapp.presentation.task.list\n\nimport androidx.compose.foundation.background\nimport androidx.compose.foundation.layout.*\nimport androidx.compose.foundation.lazy.LazyColumn\nimport androidx.compose.foundation.lazy.items\nimport androidx.compose.foundation.shape.CircleShape\nimport androidx.compose.foundation.shape.RoundedCornerShape\nimport androidx.compose.material.icons.Icons\nimport androidx.compose.material.icons.filled.*\nimport androidx.compose.material3.*\nimport androidx.compose.runtime.*\nimport androidx.compose.ui.Alignment\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.graphics.Color\nimport androidx.compose.ui.unit.dp\nimport androidx.lifecycle.compose.collectAsStateWithLifecycle\nimport com.example.focusbuddyapp.ui.components.TaskCard\nimport com.example.focusbuddyapp.ui.theme.*\n\n@Composable\nfun TaskListScreen(\n    viewModel: TaskListViewModel,\n    onNavigateToTask: (Int) -> Unit,\n    onNavigateToAddTask: () -> Unit\n) {\n    val uiState by viewModel.uiState.collectAsStateWithLifecycle()\n    val filters = listOf(\"ALL\", \"HIGH\", \"MEDIUM\", \"LOW\", \"DONE\")\n\n    Scaffold(\n        floatingActionButton = {\n            FloatingActionButton(\n                onClick = onNavigateToAddTask,\n                containerColor = PrimaryNavy,\n                contentColor = Color.White,\n                shape = CircleShape\n            ) { Icon(Icons.Filled.Add, \"Add Task\") }\n        },\n        containerColor = WarmBackground\n    ) { paddingValues ->\n        Column(\n            modifier = Modifier\n                .fillMaxSize()\n                .padding(paddingValues)\n                .padding(horizontal = 20.dp)\n        ) {\n            Spacer(Modifier.height(16.dp))\n\n            // Header\n            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {\n                Box(Modifier.size(44.dp).background(SurfaceDim, CircleShape), contentAlignment = Alignment.Center) {\n                    Icon(Icons.Filled.Per
-<truncated 4456 bytes>
+package com.example.focusbuddyapp.presentation.task.list
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.focusbuddyapp.ui.components.TaskCard
+import com.example.focusbuddyapp.ui.theme.*
+
+@Composable
+fun TaskListScreen(
+    viewModel: TaskListViewModel,
+    onNavigateToTask: (Int) -> Unit,
+    onNavigateToAddTask: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val filters = listOf("ALL", "HIGH", "MEDIUM", "LOW", "DONE")
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNavigateToAddTask,
+                containerColor = PrimaryNavy,
+                contentColor = Color.White,
+                shape = CircleShape
+            ) { Icon(Icons.Filled.Add, "Add Task") }
+        },
+        containerColor = WarmBackground
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 20.dp)
+        ) {
+            Spacer(Modifier.height(16.dp))
+
+            // Header
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(44.dp).background(SurfaceDim, CircleShape), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Filled.Person, null, tint = PrimaryNavy)
+                }
+                Spacer(Modifier.width(12.dp))
+                Text("Hello, Scholar", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
+                Spacer(Modifier.weight(1f))
+                Icon(Icons.Filled.Settings, null, tint = SecondaryText)
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Search bar
+            OutlinedTextField(
+                value = uiState.searchQuery,
+                onValueChange = viewModel::onSearchChange,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Search tasks...", color = SecondaryText) },
+                leadingIcon = { Icon(Icons.Filled.Search, null, tint = SecondaryText) },
+                singleLine = true,
+                shape = RoundedCornerShape(50),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryNavy,
+                    unfocusedBorderColor = OutlineVariant,
+                    focusedContainerColor = SurfaceWhite,
+                    unfocusedContainerColor = SurfaceWhite
+                )
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            // Filter chips row
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                filters.forEach { filter ->
+                    val isSelected = uiState.selectedFilter == filter
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { viewModel.onFilterChange(filter) },
+                        label = { Text(filter, style = MaterialTheme.typography.labelMedium) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = PrimaryNavy,
+                            selectedLabelColor = Color.White,
+                            containerColor = SurfaceContainer,
+                            labelColor = SecondaryText
+                        )
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(10.dp))
+
+            // Queue header
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Task Queue", style = MaterialTheme.typography.titleMedium, color = PrimaryText)
+                Text(
+                    "${uiState.filteredTasks.size} Tasks remaining",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = SecondaryText
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // ─── LazyColumn (academic requirement) ──────────────────────────
+            if (uiState.isLoading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = PrimaryNavy)
+                }
+            } else if (uiState.filteredTasks.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.Assignment, null, tint = SecondaryText, modifier = Modifier.size(48.dp))
+                        Spacer(Modifier.height(12.dp))
+                        Text("No tasks found", style = MaterialTheme.typography.bodyLarge, color = SecondaryText)
+                        Text("Tap + to add your first task", style = MaterialTheme.typography.bodyMedium, color = SecondaryText)
+                    }
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(bottom = 80.dp)
+                ) {
+                    items(
+                        items = uiState.filteredTasks,
+                        key = { task -> task.id }
+                    ) { task ->
+                        TaskCard(
+                            task = task,
+                            onCheckedChange = { isChecked -> viewModel.toggleComplete(task.id, isChecked) },
+                            onClick = { onNavigateToTask(task.id) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

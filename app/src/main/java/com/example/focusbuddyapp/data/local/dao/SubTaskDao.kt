@@ -12,9 +12,12 @@ interface SubTaskDao {
     @Update
     suspend fun updateSubTask(subTask: SubTaskEntity)
 
-    @Query("SELECT * FROM subtasks WHERE parent_task_id = :parentTaskId")
-    fun getSubTasksForTask(parentTaskId: Int): Flow<List<SubTaskEntity>>
-
     @Query("DELETE FROM subtasks WHERE id = :id")
     suspend fun deleteSubTask(id: Int)
+
+    @Query("SELECT * FROM subtasks WHERE parent_task_id = :taskId")
+    fun getSubTasksForTask(taskId: Int): Flow<List<SubTaskEntity>>
+
+    @Query("UPDATE subtasks SET is_completed = :isCompleted WHERE id = :id")
+    suspend fun toggleSubTask(id: Int, isCompleted: Boolean)
 }

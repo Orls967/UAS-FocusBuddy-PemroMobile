@@ -1,1 +1,42 @@
-"package com.example.focusbuddyapp.presentation.splash\n\nimport androidx.lifecycle.ViewModel\nimport androidx.lifecycle.ViewModelProvider\nimport androidx.lifecycle.viewModelScope\nimport com.example.focusbuddyapp.di.AppModule\nimport kotlinx.coroutines.delay\nimport kotlinx.coroutines.flow.MutableStateFlow\nimport kotlinx.coroutines.flow.StateFlow\nimport kotlinx.coroutines.flow.asStateFlow\nimport kotlinx.coroutines.launch\n\nsealed interface SplashUiState {\n    object Loading : SplashUiState\n    object NavigateToLogin : SplashUiState\n    object NavigateToDashboard : SplashUiState\n}\n\nclass SplashViewModel : ViewModel() {\n    private val _uiState = MutableStateFlow<SplashUiState>(SplashUiState.Loading)\n    val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()\n\n    init {\n        checkAuthState()\n    }\n\n    private fun checkAuthState() = viewModelScope.launch {\n        delay(1800) // Show splash for at least 1.8s\n        _uiState.value = if (AppModule.authRepository.isLoggedIn()) {\n            SplashUiState.NavigateToDashboard\n        } else {\n            SplashUiState.NavigateToLogin\n        }\n    }\n}\n\nclass SplashViewModelFactory : ViewModelProvider.Factory {\n    override fun <T : ViewModel> create(modelClass: Class<T>): T {\n        @Suppress(\"UNCHECKED_CAST\")\n        return SplashViewModel() as T\n    }\n}\n"
+package com.example.focusbuddyapp.presentation.splash
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.focusbuddyapp.di.AppModule
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+sealed interface SplashUiState {
+    object Loading : SplashUiState
+    object NavigateToLogin : SplashUiState
+    object NavigateToDashboard : SplashUiState
+}
+
+class SplashViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow<SplashUiState>(SplashUiState.Loading)
+    val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()
+
+    init {
+        checkAuthState()
+    }
+
+    private fun checkAuthState() = viewModelScope.launch {
+        delay(1800) // Show splash for at least 1.8s
+        _uiState.value = if (AppModule.authRepository.isLoggedIn()) {
+            SplashUiState.NavigateToDashboard
+        } else {
+            SplashUiState.NavigateToLogin
+        }
+    }
+}
+
+class SplashViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+        return SplashViewModel() as T
+    }
+}

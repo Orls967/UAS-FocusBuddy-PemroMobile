@@ -1,2 +1,184 @@
-"package com.example.focusbuddyapp.presentation.task.addedit\n\nimport androidx.compose.foundation.*\nimport androidx.compose.foundation.layout.*\nimport androidx.compose.foundation.shape.RoundedCornerShape\nimport androidx.compose.material.icons.Icons\nimport androidx.compose.material.icons.filled.*\nimport androidx.compose.material3.*\nimport androidx.compose.runtime.*\nimport androidx.compose.ui.Alignment\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.graphics.Color\nimport androidx.compose.ui.unit.dp\nimport androidx.lifecycle.compose.collectAsStateWithLifecycle\nimport com.example.focusbuddyapp.domain.model.Priority\nimport com.example.focusbuddyapp.ui.theme.*\n\n@Composable\nfun AddEditTaskScreen(\n    viewModel: AddEditTaskViewModel,\n    onSaved: () -> Unit,\n    onCancel: () -> Unit\n) {\n    val uiState by viewModel.uiState.collectAsStateWithLifecycle()\n\n    LaunchedEffect(uiState.isSaved) {\n        if (uiState.isSaved) onSaved()\n    }\n\n    val title = if (uiState.isEditMode) \"Edit Task\" else \"New Task\"\n    val categories = listOf(\"Academic Focus\", \"Research\", \"Personal\", \"Group Project\", \"Exam Prep\")\n\n    Scaffold(\n        topBar = {\n            TopAppBar(\n                title = { Text(title, style = MaterialTheme.typography.titleLarge) },\n                navigationIcon = {\n                    IconButton(onClick = onCancel) { Icon(Icons.Filled.Close, \"Cancel\") }\n                },\n                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBackground)\n            )\n        },\n        containerColor = WarmBackground\n    ) { paddingValues ->\n        Column(\n            modifier = Modifier\n                .fillMaxSize()\n                .padding(paddingValues)\n                .verticalScroll(rememberScrollState())\n                .padding(horizontal = 20.dp)\n        ) {\n            Spacer(Modifier.height(8.dp))\n\n            // Main form card\n            Card(\n                shape = RoundedCornerShape(24.dp),\n          
-<truncated 6855 bytes>
+package com.example.focusbuddyapp.presentation.task.addedit
+
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.focusbuddyapp.domain.model.Priority
+import com.example.focusbuddyapp.ui.theme.*
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddEditTaskScreen(
+    viewModel: AddEditTaskViewModel,
+    onSaved: () -> Unit,
+    onCancel: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) onSaved()
+    }
+
+    val title = if (uiState.isEditMode) "Edit Task" else "New Task"
+    val categories = listOf("Academic Focus", "Research", "Personal", "Group Project", "Exam Prep")
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(title, style = MaterialTheme.typography.titleLarge) },
+                navigationIcon = {
+                    IconButton(onClick = onCancel) { Icon(Icons.Filled.Close, "Cancel") }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBackground)
+            )
+        },
+        containerColor = WarmBackground
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+        ) {
+            Spacer(Modifier.height(8.dp))
+
+            // Main form card
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(SurfaceWhite),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Column(Modifier.padding(20.dp)) {
+
+                    // Task Title
+                    Text("Task Title", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                    Spacer(Modifier.height(6.dp))
+                    OutlinedTextField(
+                        value = uiState.title,
+                        onValueChange = viewModel::onTitleChange,
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("e.g., Advanced Microeconomics Research", color = SecondaryText) },
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
+                            focusedContainerColor = WarmBeige.copy(0.4f), unfocusedContainerColor = WarmBeige.copy(0.4f)
+                        )
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // Category dropdown
+                    Text("Category", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                    Spacer(Modifier.height(6.dp))
+                    var expanded by remember { mutableStateOf(false) }
+                    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                        OutlinedTextField(
+                            value = uiState.category,
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier.menuAnchor().fillMaxWidth(),
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
+                                focusedContainerColor = WarmBeige.copy(0.4f), unfocusedContainerColor = WarmBeige.copy(0.4f)
+                            )
+                        )
+                        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            categories.forEach { cat ->
+                                DropdownMenuItem(text = { Text(cat) }, onClick = {
+                                    viewModel.onCategoryChange(cat)
+                                    expanded = false
+                                })
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // Priority
+                    Text("Priority Level", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Priority.values().forEach { priority ->
+                            val selected = uiState.priority == priority
+                            FilterChip(
+                                selected = selected,
+                                onClick = { viewModel.onPriorityChange(priority) },
+                                label = { Text(priority.name, style = MaterialTheme.typography.labelMedium) },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = when (priority) {
+                                        Priority.HIGH   -> PriorityHighBg
+                                        Priority.MEDIUM -> PriorityMedBg
+                                        Priority.LOW    -> PriorityLowBg
+                                    },
+                                    selectedLabelColor = when (priority) {
+                                        Priority.HIGH   -> PriorityHighText
+                                        Priority.MEDIUM -> PriorityMedText
+                                        Priority.LOW    -> PriorityLowText
+                                    },
+                                    containerColor = SurfaceContainer,
+                                    labelColor = SecondaryText
+                                )
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // Study Notes
+                    Text("Study Notes", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                    Spacer(Modifier.height(6.dp))
+                    OutlinedTextField(
+                        value = uiState.studyNotes,
+                        onValueChange = viewModel::onStudyNotesChange,
+                        modifier = Modifier.fillMaxWidth().height(120.dp),
+                        placeholder = { Text("List specific resources or sub-tasks here...", color = SecondaryText) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
+                            focusedContainerColor = WarmBeige.copy(0.4f), unfocusedContainerColor = WarmBeige.copy(0.4f)
+                        )
+                    )
+                }
+            }
+
+            if (uiState.errorMessage != null) {
+                Spacer(Modifier.height(8.dp))
+                Text(uiState.errorMessage!!, color = ErrorRed, style = MaterialTheme.typography.bodySmall)
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            // Save button
+            Button(
+                onClick = viewModel::save,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                enabled = !uiState.isLoading,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryNavy)
+            ) {
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                } else {
+                    Icon(Icons.Filled.Save, null, tint = Color.White)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Save Task", style = MaterialTheme.typography.titleMedium, color = Color.White)
+                }
+            }
+
+            Spacer(Modifier.height(32.dp))
+        }
+    }
+}

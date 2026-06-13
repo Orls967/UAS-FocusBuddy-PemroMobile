@@ -29,6 +29,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+/**
+ * Manual DI container (ServiceLocator pattern).
+ * All dependencies are created lazily and held as singletons.
+ */
 object AppModule {
     private const val BASE_URL = "https://api.focusbuddy.app/v1/"
     private const val QUOTE_URL = "https://api.quotable.io/"
@@ -39,14 +43,17 @@ object AppModule {
         appContext = context.applicationContext
     }
 
+    // ─── Preferences ───────────────────────────────────────────────────────
     val userPreferences: UserPreferences by lazy { UserPreferences(appContext) }
 
+    // ─── Database ──────────────────────────────────────────────────────────
     private val database: AppDatabase by lazy { AppDatabase.getInstance(appContext) }
     val userDao by lazy { database.userDao() }
     val taskDao by lazy { database.taskDao() }
     val subTaskDao by lazy { database.subTaskDao() }
     val focusSessionDao by lazy { database.focusSessionDao() }
 
+    // ─── Network ───────────────────────────────────────────────────────────
     private val loggingInterceptor by lazy {
         HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
     }
@@ -88,6 +95,7 @@ object AppModule {
     val taskApiService: TaskApiService by lazy { retrofit.create(TaskApiService::class.java) }
     val quoteApiService: QuoteApiService by lazy { quoteRetrofit.create(QuoteApiService::class.java) }
 
+    // ─── Repositories ──────────────────────────────────────────────────────
     val authRepository: AuthRepository by lazy {
         AuthRepositoryImpl(authApiService, userDao, userPreferences)
     }
@@ -101,6 +109,7 @@ object AppModule {
         QuoteRepositoryImpl(quoteApiService)
     }
 
+    // ─── Use Cases ─────────────────────────────────────────────────────────
     val loginUseCase by lazy { LoginUseCase(authRepository) }
     val registerUseCase by lazy { RegisterUseCase(authRepository) }
     val logoutUseCase by lazy { LogoutUseCase(authRepository) }

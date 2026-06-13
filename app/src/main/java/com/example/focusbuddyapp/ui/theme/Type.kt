@@ -15,6 +15,7 @@ val provider = GoogleFont.Provider(
     certificates = R.array.com_google_android_gms_fonts_certs
 )
 
+// Manrope — Headlines
 val ManropeFontFamily = FontFamily(
     Font(GoogleFont("Manrope"), provider, FontWeight.Normal),
     Font(GoogleFont("Manrope"), provider, FontWeight.SemiBold),
@@ -22,12 +23,14 @@ val ManropeFontFamily = FontFamily(
     Font(GoogleFont("Manrope"), provider, FontWeight.ExtraBold),
 )
 
+// Hanken Grotesk — Body
 val HankenGroteskFontFamily = FontFamily(
     Font(GoogleFont("Hanken Grotesk"), provider, FontWeight.Normal),
     Font(GoogleFont("Hanken Grotesk"), provider, FontWeight.Medium),
     Font(GoogleFont("Hanken Grotesk"), provider, FontWeight.SemiBold),
 )
 
+// JetBrains Mono — Data / Labels / Timer
 val JetBrainsMonoFontFamily = FontFamily(
     Font(GoogleFont("JetBrains Mono"), provider, FontWeight.Normal),
     Font(GoogleFont("JetBrains Mono"), provider, FontWeight.Medium),
@@ -35,6 +38,7 @@ val JetBrainsMonoFontFamily = FontFamily(
 )
 
 val FocusBuddyTypography = Typography(
+    // Display — App Logo on Splash
     displayLarge = TextStyle(
         fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.ExtraBold,
@@ -42,24 +46,28 @@ val FocusBuddyTypography = Typography(
         lineHeight = 40.sp,
         letterSpacing = (-0.02).sp
     ),
+    // H1 — Page Titles (Dashboard, Focus Session)
     headlineLarge = TextStyle(
         fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
         lineHeight = 36.sp
     ),
+    // H2 — Section Titles
     headlineMedium = TextStyle(
         fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
         lineHeight = 32.sp
     ),
+    // H3 — Card Titles
     headlineSmall = TextStyle(
         fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
         lineHeight = 28.sp
     ),
+    // Task Title / Card Heading
     titleLarge = TextStyle(
         fontFamily = ManropeFontFamily,
         fontWeight = FontWeight.SemiBold,
@@ -78,6 +86,7 @@ val FocusBuddyTypography = Typography(
         fontSize = 14.sp,
         lineHeight = 20.sp
     ),
+    // Body — Descriptions, Notes
     bodyLarge = TextStyle(
         fontFamily = HankenGroteskFontFamily,
         fontWeight = FontWeight.Normal,
@@ -96,6 +105,7 @@ val FocusBuddyTypography = Typography(
         fontSize = 12.sp,
         lineHeight = 16.sp
     ),
+    // Labels — Priority tags, timer data
     labelLarge = TextStyle(
         fontFamily = JetBrainsMonoFontFamily,
         fontWeight = FontWeight.Medium,

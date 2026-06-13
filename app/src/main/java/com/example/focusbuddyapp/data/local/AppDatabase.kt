@@ -4,8 +4,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
-import com.example.focusbuddyapp.data.local.dao.*
-import com.example.focusbuddyapp.data.local.entity.*
+import com.example.focusbuddyapp.data.local.dao.FocusSessionDao
+import com.example.focusbuddyapp.data.local.dao.SubTaskDao
+import com.example.focusbuddyapp.data.local.dao.TaskDao
+import com.example.focusbuddyapp.data.local.dao.UserDao
+import com.example.focusbuddyapp.data.local.entity.FocusSessionEntity
+import com.example.focusbuddyapp.data.local.entity.SubTaskEntity
+import com.example.focusbuddyapp.data.local.entity.TaskEntity
+import com.example.focusbuddyapp.data.local.entity.UserEntity
 
 @Database(
     entities = [

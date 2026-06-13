@@ -1,6 +1,7 @@
 package com.example.focusbuddyapp.data.remote.api
 
-import com.example.focusbuddyapp.data.remote.dto.*
+import com.example.focusbuddyapp.data.remote.dto.TaskCreateRequestDto
+import com.example.focusbuddyapp.data.remote.dto.TaskDto
 import retrofit2.http.*
 
 interface TaskApiService {
@@ -20,5 +21,5 @@ interface TaskApiService {
     suspend fun deleteTask(@Path("id") id: String)
 
     @PATCH("tasks/{id}/complete")
-    suspend fun toggleComplete(@Path("id") id: String, @Query("completed") completed: Boolean): TaskDto
+    suspend fun toggleComplete(@Path("id") id: String, @Body body: Map<String, Boolean>): TaskDto
 }

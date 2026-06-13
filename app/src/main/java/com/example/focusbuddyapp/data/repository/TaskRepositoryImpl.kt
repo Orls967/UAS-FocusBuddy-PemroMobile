@@ -11,6 +11,7 @@ import com.example.focusbuddyapp.domain.model.Task
 import com.example.focusbuddyapp.domain.repository.TaskRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -21,26 +22,32 @@ class TaskRepositoryImpl(
     private val taskApiService: TaskApiService
 ) : TaskRepository {
 
+    // ── BREAD: Browse ─────────────────────────────────────────────────────────
     override fun getAllTasks(): Flow<List<Task>> =
         taskDao.getAllTasks().map { entities ->
             entities.map { entity -> entity.toDomain() }
         }
 
+    // ── BREAD: Read ───────────────────────────────────────────────────────────
     override suspend fun getTaskById(id: Int): Task? = withContext(Dispatchers.IO) {
         taskDao.getTaskById(id)?.toDomain()
     }
 
+    // ── BREAD: Add ────────────────────────────────────────────────────────────
     override suspend fun addTask(task: Task): Long = withContext(Dispatchers.IO) {
         val id = taskDao.insertTask(task.toEntity())
+        // Sync to remote in background (best-effort)
         syncTaskToRemote(task.copy(id = id.toInt()))
         id
     }
 
+    // ── BREAD: Edit ───────────────────────────────────────────────────────────
     override suspend fun updateTask(task: Task) = withContext(Dispatchers.IO) {
         taskDao.updateTask(task.toEntity())
         syncTaskToRemote(task)
     }
 
+    // ── BREAD: Delete ─────────────────────────────────────────────────────────
     override suspend fun deleteTask(id: Int) = withContext(Dispatchers.IO) {
         val task = taskDao.getTaskById(id)
         task?.remoteId?.let {
@@ -68,10 +75,13 @@ class TaskRepositoryImpl(
         return taskDao.getCompletedTodayCount(start, end)
     }
 
+    // ── Remote sync ───────────────────────────────────────────────────────────
     override suspend fun syncWithRemote(): Unit = withContext(Dispatchers.IO) {
         runCatching {
             val remoteTasks = taskApiService.getAllTasks()
             remoteTasks.forEach { dto ->
+                val existing = taskDao.getUnsyncedTasks()
+                // Upsert remote tasks to local
                 val entity = dto.toDomain().toEntity()
                 taskDao.insertTask(entity)
             }

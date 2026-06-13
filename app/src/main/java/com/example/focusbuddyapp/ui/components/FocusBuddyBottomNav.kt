@@ -1,50 +1,68 @@
 package com.example.focusbuddyapp.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.focusbuddyapp.presentation.navigation.BottomNavItem
-import com.example.focusbuddyapp.ui.theme.*
+import com.example.focusbuddyapp.presentation.navigation.bottomNavItems
+import com.example.focusbuddyapp.ui.theme.DarkTerracotta
+import com.example.focusbuddyapp.ui.theme.PrimaryNavy
+import com.example.focusbuddyapp.ui.theme.SecondaryText
+import com.example.focusbuddyapp.ui.theme.SurfaceWhite
 
 @Composable
-fun FocusBuddyBottomNav(navController: NavController) {
-    val items = listOf(
-        BottomNavItem.Dashboard,
-        BottomNavItem.Tasks,
-        BottomNavItem.Timer,
-        BottomNavItem.Progress,
-        BottomNavItem.Profile
-    )
+fun FocusBuddyBottomNav(
+    navController: NavController,
+    currentRoute: String?
+) {
     NavigationBar(
-        containerColor = SurfaceWhite
+        containerColor = SurfaceWhite,
+        tonalElevation = 8.dp
     ) {
-        val navBackStackEntry = navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry.value?.destination?.route
-
-        items.forEach { item ->
+        bottomNavItems.forEach { item ->
+            val selected = currentRoute == item.route
+            val scale by animateFloatAsState(
+                targetValue = if (selected) 1.1f else 1f,
+                label = "nav_scale_${item.label}"
+            )
             NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.title) },
-                label = { Text(item.title, style = FocusBuddyTypography.labelSmall) },
-                selected = currentRoute == item.route,
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PrimaryTerracotta,
-                    selectedTextColor = PrimaryTerracotta,
-                    unselectedIconColor = SecondaryText,
-                    unselectedTextColor = SecondaryText,
-                    indicatorColor = SurfaceContainer
-                ),
+                selected = selected,
                 onClick = {
                     if (currentRoute != item.route) {
                         navController.navigate(item.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
                     }
-                }
+                },
+                icon = {
+                    Icon(
+                        imageVector = item.icon,
+                        contentDescription = item.label,
+                        modifier = Modifier.scale(scale)
+                    )
+                },
+                label = {
+                    Text(
+                        text = item.label,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = PrimaryNavy,
+                    selectedTextColor = DarkTerracotta,
+                    indicatorColor = PrimaryNavy.copy(alpha = 0.12f),
+                    unselectedIconColor = SecondaryText,
+                    unselectedTextColor = SecondaryText
+                )
             )
         }
     }

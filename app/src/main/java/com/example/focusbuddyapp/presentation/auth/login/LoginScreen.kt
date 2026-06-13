@@ -1,2 +1,174 @@
-"package com.example.focusbuddyapp.presentation.auth.login\n\nimport androidx.compose.foundation.*\nimport androidx.compose.foundation.layout.*\nimport androidx.compose.foundation.shape.RoundedCornerShape\nimport androidx.compose.foundation.text.KeyboardActions\nimport androidx.compose.foundation.text.KeyboardOptions\nimport androidx.compose.material.icons.Icons\nimport androidx.compose.material.icons.filled.*\nimport androidx.compose.material3.*\nimport androidx.compose.runtime.*\nimport androidx.compose.ui.Alignment\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.focus.FocusDirection\nimport androidx.compose.ui.graphics.Color\nimport androidx.compose.ui.platform.LocalFocusManager\nimport androidx.compose.ui.text.input.*\nimport androidx.compose.ui.text.style.TextAlign\nimport androidx.compose.ui.unit.dp\nimport androidx.lifecycle.compose.collectAsStateWithLifecycle\nimport com.example.focusbuddyapp.ui.theme.*\n\n@Composable\nfun LoginScreen(\n    viewModel: LoginViewModel,\n    onLoginSuccess: () -> Unit,\n    onNavigateToRegister: () -> Unit\n) {\n    val uiState by viewModel.uiState.collectAsStateWithLifecycle()\n    val focusManager = LocalFocusManager.current\n\n    LaunchedEffect(uiState.isSuccess) {\n        if (uiState.isSuccess) onLoginSuccess()\n    }\n\n    Column(\n        modifier = Modifier\n            .fillMaxSize()\n            .background(WarmBackground)\n            .verticalScroll(rememberScrollState())\n            .padding(horizontal = 24.dp),\n        horizontalAlignment = Alignment.CenterHorizontally\n    ) {\n        Spacer(Modifier.height(64.dp))\n\n        // Logo icon\n        Box(\n            modifier = Modifier\n                .size(72.dp)\n                .background(PrimaryNavy, RoundedCornerShape(20.dp)),\n            contentAlignment = Alignment.Center\n        ) {\n            Icon(Icons.Filled.School, contentDescription = null, tint = Color.White, modifier = Modifier.size(36.dp))\n        }\n\n        Spacer(Modifier.height(24.dp))\n\n        Text(\"Welcome 
-<truncated 5744 bytes>
+package com.example.focusbuddyapp.presentation.auth.login
+
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.focusbuddyapp.ui.theme.*
+
+@Composable
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    onLoginSuccess: () -> Unit,
+    onNavigateToRegister: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) onLoginSuccess()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(WarmBackground)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(Modifier.height(64.dp))
+
+        // Logo icon
+        Box(
+            modifier = Modifier
+                .size(72.dp)
+                .background(PrimaryNavy, RoundedCornerShape(20.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.Filled.School, contentDescription = null, tint = Color.White, modifier = Modifier.size(36.dp))
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Text("Welcome Back", style = MaterialTheme.typography.headlineLarge, color = PrimaryText)
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = "Ready to dive back into your focus session, Scholar?",
+            style = MaterialTheme.typography.bodyMedium,
+            color = SecondaryText,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(Modifier.height(32.dp))
+
+        // Form card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(Modifier.padding(24.dp)) {
+                Text("Email Address", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                Spacer(Modifier.height(6.dp))
+                OutlinedTextField(
+                    value = uiState.email,
+                    onValueChange = viewModel::onEmailChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("name@university.edu", color = SecondaryText) },
+                    leadingIcon = { Icon(Icons.Filled.Email, null, tint = SecondaryText) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryNavy,
+                        unfocusedBorderColor = OutlineVariant,
+                        focusedContainerColor = WarmBeige.copy(alpha = 0.4f),
+                        unfocusedContainerColor = WarmBeige.copy(alpha = 0.4f)
+                    )
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Text("Password", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                Spacer(Modifier.height(6.dp))
+                OutlinedTextField(
+                    value = uiState.password,
+                    onValueChange = viewModel::onPasswordChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("••••••••", color = SecondaryText) },
+                    leadingIcon = { Icon(Icons.Filled.Lock, null, tint = SecondaryText) },
+                    trailingIcon = {
+                        IconButton(onClick = viewModel::togglePasswordVisibility) {
+                            Icon(
+                                if (uiState.isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                contentDescription = "Toggle password",
+                                tint = SecondaryText
+                            )
+                        }
+                    },
+                    singleLine = true,
+                    visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        focusManager.clearFocus()
+                        viewModel.login()
+                    }),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryNavy,
+                        unfocusedBorderColor = OutlineVariant,
+                        focusedContainerColor = WarmBeige.copy(alpha = 0.4f),
+                        unfocusedContainerColor = WarmBeige.copy(alpha = 0.4f)
+                    )
+                )
+
+                // Error
+                if (uiState.errorMessage != null) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(uiState.errorMessage!!, color = ErrorRed, style = MaterialTheme.typography.bodySmall)
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Button(
+                    onClick = viewModel::login,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    enabled = !uiState.isLoading,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryNavy)
+                ) {
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                    } else {
+                        Text("Login →", style = MaterialTheme.typography.titleMedium, color = Color.White)
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                TextButton(
+                    onClick = onNavigateToRegister,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Don't have an account? ", color = SecondaryText, style = MaterialTheme.typography.bodyMedium)
+                    Text("Sign Up!", color = PrimaryTerracotta, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+
+        Spacer(Modifier.height(32.dp))
+    }
+}

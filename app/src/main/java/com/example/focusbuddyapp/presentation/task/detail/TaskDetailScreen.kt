@@ -1,2 +1,190 @@
-"package com.example.focusbuddyapp.presentation.task.detail\n\nimport androidx.compose.foundation.*\nimport androidx.compose.foundation.layout.*\nimport androidx.compose.foundation.shape.RoundedCornerShape\nimport androidx.compose.material.icons.Icons\nimport androidx.compose.material.icons.filled.*\nimport androidx.compose.material3.*\nimport androidx.compose.runtime.*\nimport androidx.compose.ui.Alignment\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.graphics.Color\nimport androidx.compose.ui.text.style.TextDecoration\nimport androidx.compose.ui.unit.dp\nimport androidx.lifecycle.compose.collectAsStateWithLifecycle\nimport com.example.focusbuddyapp.ui.components.PriorityChip\nimport com.example.focusbuddyapp.ui.theme.*\nimport java.text.SimpleDateFormat\nimport java.util.*\n\n@Composable\nfun TaskDetailScreen(\n    viewModel: TaskDetailViewModel,\n    onNavigateToEdit: () -> Unit,\n    onNavigateBack: () -> Unit,\n    onNavigateToTimer: () -> Unit\n) {\n    val uiState by viewModel.uiState.collectAsStateWithLifecycle()\n\n    LaunchedEffect(uiState.isDeleted) {\n        if (uiState.isDeleted) onNavigateBack()\n    }\n\n    Scaffold(\n        topBar = {\n            TopAppBar(\n                title = { Text(\"Task Details\", style = MaterialTheme.typography.titleLarge) },\n                navigationIcon = {\n                    IconButton(onClick = onNavigateBack) {\n                        Icon(Icons.Filled.ArrowBack, \"Back\")\n                    }\n                },\n                actions = {\n                    IconButton(onClick = onNavigateToEdit) {\n                        Icon(Icons.Filled.Edit, \"Edit\", tint = SecondaryText)\n                    }\n                    IconButton(onClick = viewModel::deleteTask) {\n                        Icon(Icons.Filled.Delete, \"Delete\", tint = PrimaryTerracotta)\n                    }\n                },\n                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBackground)\n            )\n        },\n        containe
-<truncated 7441 bytes>
+package com.example.focusbuddyapp.presentation.task.detail
+
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.focusbuddyapp.ui.components.PriorityChip
+import com.example.focusbuddyapp.ui.theme.*
+import java.text.SimpleDateFormat
+import java.util.*
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TaskDetailScreen(
+    viewModel: TaskDetailViewModel,
+    onNavigateToEdit: () -> Unit,
+    onNavigateBack: () -> Unit,
+    onNavigateToTimer: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.isDeleted) {
+        if (uiState.isDeleted) onNavigateBack()
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Task Details", style = MaterialTheme.typography.titleLarge) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.Filled.ArrowBack, "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToEdit) {
+                        Icon(Icons.Filled.Edit, "Edit", tint = SecondaryText)
+                    }
+                    IconButton(onClick = viewModel::deleteTask) {
+                        Icon(Icons.Filled.Delete, "Delete", tint = PrimaryTerracotta)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBackground)
+            )
+        },
+        containerColor = WarmBackground
+    ) { paddingValues ->
+        if (uiState.isLoading) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = PrimaryNavy)
+            }
+            return@Scaffold
+        }
+
+        val task = uiState.task ?: return@Scaffold
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 12.dp)
+        ) {
+            // Task header card
+            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(SurfaceWhite), elevation = CardDefaults.cardElevation(2.dp)) {
+                Column(Modifier.padding(16.dp)) {
+                    PriorityChip(priority = task.priority)
+                    Spacer(Modifier.height(8.dp))
+                    Text(task.title, style = MaterialTheme.typography.headlineSmall, color = PrimaryText)
+                    Spacer(Modifier.height(4.dp))
+                    task.dueDate?.let { date ->
+                        val fmt = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.CalendarToday, null, tint = SecondaryText, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text("Due: ${fmt.format(Date(date))}", style = MaterialTheme.typography.bodySmall, color = SecondaryText)
+                        }
+                    }
+                    if (task.category.isNotBlank()) {
+                        Spacer(Modifier.height(2.dp))
+                        Text(task.category, style = MaterialTheme.typography.bodySmall, color = SecondaryText)
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // Description
+            if (task.description.isNotBlank()) {
+                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(SurfaceWhite), elevation = CardDefaults.cardElevation(2.dp)) {
+                    Column(Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Description, null, tint = SecondaryText, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text("Description", style = MaterialTheme.typography.titleSmall, color = PrimaryText)
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Text(task.description, style = MaterialTheme.typography.bodyMedium, color = PrimaryText)
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+
+            // Progress card
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = PrimaryNavy),
+                elevation = CardDefaults.cardElevation(4.dp)
+            ) {
+                Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("${task.progressPercent}%", style = MaterialTheme.typography.headlineLarge, color = Color.White)
+                    Text("Project Momentum", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(0.7f))
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onNavigateToTimer,
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                        border = BorderStroke(1.dp, Color.White.copy(0.5f))
+                    ) { Text("Start Timer", color = Color.White) }
+                }
+            }
+
+            // Sub-tasks
+            if (task.subTasks.isNotEmpty()) {
+                Spacer(Modifier.height(12.dp))
+                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(SurfaceWhite), elevation = CardDefaults.cardElevation(2.dp)) {
+                    Column(Modifier.padding(16.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Filled.Checklist, null, tint = SecondaryText, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text("Sub-tasks", style = MaterialTheme.typography.titleSmall, color = PrimaryText)
+                            }
+                            TextButton(onClick = {}) { Text("+ New Sub-task", color = PrimaryTerracotta) }
+                        }
+                        task.subTasks.forEach { subTask ->
+                            Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = subTask.isCompleted,
+                                    onCheckedChange = null,
+                                    colors = CheckboxDefaults.colors(checkedColor = SuccessGreen)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = subTask.title,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (subTask.isCompleted) SecondaryText else PrimaryText,
+                                    textDecoration = if (subTask.isCompleted) TextDecoration.LineThrough else null,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                if (subTask.isUrgent) {
+                                    Surface(shape = RoundedCornerShape(4.dp), color = PriorityHighBg) {
+                                        Text("URGENT", style = MaterialTheme.typography.labelSmall, color = PriorityHighText, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Complete / Uncomplete toggle
+            Button(
+                onClick = viewModel::toggleComplete,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (task.isCompleted) SurfaceContainer else SuccessGreen
+                )
+            ) {
+                Text(
+                    if (task.isCompleted) "Mark Incomplete" else "Mark Complete",
+                    color = if (task.isCompleted) SecondaryText else Color.White
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}

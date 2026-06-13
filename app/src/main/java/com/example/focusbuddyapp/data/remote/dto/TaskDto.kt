@@ -1,34 +1,33 @@
 package com.example.focusbuddyapp.data.remote.dto
 
-import com.google.gson.annotations.SerializedName
-
-data class SubTaskDto(
-    @SerializedName("id") val id: String,
-    @SerializedName("title") val title: String,
-    @SerializedName("is_completed") val isCompleted: Boolean,
-    @SerializedName("is_urgent") val isUrgent: Boolean
+data class TaskDto(
+    val id: String,
+    val title: String,
+    val description: String?,
+    val category: String,
+    val priority: String,      // "HIGH" | "MEDIUM" | "LOW"
+    val dueDate: Long?,
+    val dueTime: String?,
+    val isCompleted: Boolean,
+    val progressPercent: Int,
+    val studyNotes: String?,
+    val subTasks: List<SubTaskDto>?
 )
 
-data class TaskDto(
-    @SerializedName("id") val id: String,
-    @SerializedName("title") val title: String,
-    @SerializedName("description") val description: String? = null,
-    @SerializedName("category") val category: String,
-    @SerializedName("priority") val priority: String,
-    @SerializedName("due_date") val dueDate: Long? = null,
-    @SerializedName("due_time") val dueTime: String? = null,
-    @SerializedName("is_completed") val isCompleted: Boolean,
-    @SerializedName("progress_percent") val progressPercent: Int,
-    @SerializedName("study_notes") val studyNotes: String? = null,
-    @SerializedName("sub_tasks") val subTasks: List<SubTaskDto>? = null
+data class SubTaskDto(
+    val id: String,
+    val parentTaskId: String,
+    val title: String,
+    val isCompleted: Boolean,
+    val isUrgent: Boolean
 )
 
 data class TaskCreateRequestDto(
-    @SerializedName("title") val title: String,
-    @SerializedName("description") val description: String,
-    @SerializedName("category") val category: String,
-    @SerializedName("priority") val priority: String,
-    @SerializedName("due_date") val dueDate: Long?,
-    @SerializedName("due_time") val dueTime: String?,
-    @SerializedName("study_notes") val studyNotes: String
+    val title: String,
+    val description: String?,
+    val category: String,
+    val priority: String,
+    val dueDate: Long?,
+    val dueTime: String?,
+    val studyNotes: String?
 )

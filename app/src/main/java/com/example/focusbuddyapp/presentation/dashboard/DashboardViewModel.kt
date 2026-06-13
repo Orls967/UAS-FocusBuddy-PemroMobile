@@ -1,2 +1,67 @@
-"package com.example.focusbuddyapp.presentation.dashboard\n\nimport androidx.lifecycle.ViewModel\nimport androidx.lifecycle.ViewModelProvider\nimport androidx.lifecycle.viewModelScope\nimport com.example.focusbuddyapp.di.AppModule\nimport com.example.focusbuddyapp.domain.model.Quote\nimport com.example.focusbuddyapp.domain.model.Task\nimport kotlinx.coroutines.flow.*\nimport kotlinx.coroutines.launch\n\ndata class DashboardUiState(\n    val userName: String = \"\",\n    val todayFocusMinutes: Int = 0,\n    val dailyGoalMinutes: Int = 150,  // 2h 30m default\n    val completedTodayCount: Int = 0,\n    val totalThisWeekCount: Int = 0,\n    val weeklyFocusMinutes: Int = 0,\n    val todayTasks: List<Task> = emptyList(),\n    val quote: Quote = Quote(\"Focus is the art of knowing what to ignore.\", \"Academic Momentum\"),\n    val isLoading: Boolean = true,\n    val errorMessage: String? = null\n)\n\nclass DashboardViewModel : ViewModel() {\n    private val browseTasksUseCase = AppModule.browseTasksUseCase\n    private val getTodayFocusSummaryUseCase = AppModule.getTodayFocusSummaryUseCase\n    private val logoutUseCase = AppModule.logoutUseCase\n    private val quoteRepository = AppModule.quoteRepository\n    private val userPreferences = AppModule.userPreferences\n\n    private val _uiState = MutableStateFlow(DashboardUiState())\n    val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()\n\n    init { loadDashboard() }\n\n    private fun loadDashboard() = viewModelScope.launch {\n        // User name\n        userPreferences.userName.collect { name ->\n            _uiState.update { it.copy(userName = name) }\n        }\n    }.also {\n        viewModelScope.launch {\n            browseTasksUseCase().collect { tasks ->\n                _uiState.update { it.copy(todayTasks = tasks.take(4), isLoading = false) }\n            }\n        }\n        viewModelScope.launch {\n            getTodayFocusSummaryUseCase().collect { minutes ->\n                _uiState.update { it.copy(todayFocusMinutes = minutes) }\n   
-<truncated 479 bytes>
+package com.example.focusbuddyapp.presentation.dashboard
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.focusbuddyapp.di.AppModule
+import com.example.focusbuddyapp.domain.model.Quote
+import com.example.focusbuddyapp.domain.model.Task
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+
+data class DashboardUiState(
+    val userName: String = "",
+    val todayFocusMinutes: Int = 0,
+    val dailyGoalMinutes: Int = 150,  // 2h 30m default
+    val completedTodayCount: Int = 0,
+    val totalThisWeekCount: Int = 0,
+    val weeklyFocusMinutes: Int = 0,
+    val todayTasks: List<Task> = emptyList(),
+    val quote: Quote = Quote("Focus is the art of knowing what to ignore.", "Academic Momentum"),
+    val isLoading: Boolean = true,
+    val errorMessage: String? = null
+)
+
+class DashboardViewModel : ViewModel() {
+    private val browseTasksUseCase = AppModule.browseTasksUseCase
+    private val getTodayFocusSummaryUseCase = AppModule.getTodayFocusSummaryUseCase
+    private val logoutUseCase = AppModule.logoutUseCase
+    private val quoteRepository = AppModule.quoteRepository
+    private val userPreferences = AppModule.userPreferences
+
+    private val _uiState = MutableStateFlow(DashboardUiState())
+    val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
+
+    init { loadDashboard() }
+
+    private fun loadDashboard() = viewModelScope.launch {
+        // User name
+        userPreferences.userName.collect { name ->
+            _uiState.update { it.copy(userName = name) }
+        }
+    }.also {
+        viewModelScope.launch {
+            browseTasksUseCase().collect { tasks ->
+                _uiState.update { it.copy(todayTasks = tasks.take(4), isLoading = false) }
+            }
+        }
+        viewModelScope.launch {
+            getTodayFocusSummaryUseCase().collect { minutes ->
+                _uiState.update { it.copy(todayFocusMinutes = minutes) }
+            }
+        }
+        viewModelScope.launch {
+            val quote = quoteRepository.getDailyQuote()
+            _uiState.update { it.copy(quote = quote) }
+        }
+    }
+
+    fun logout() = viewModelScope.launch { logoutUseCase() }
+}
+
+class DashboardViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+        return DashboardViewModel() as T
+    }
+}
