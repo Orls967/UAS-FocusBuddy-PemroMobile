@@ -15,7 +15,15 @@ data class ProfileUiState(
     val notificationsEnabled: Boolean = true,
     val totalFocusMinutes: Int = 0,
     val isLoading: Boolean = true,
-    val profilePhotoUri: String? = null
+    val profilePhotoUri: String? = null,
+    val isDarkMode: Boolean = false
+)
+
+private data class ProfilePrefsData(
+    val pomodoro: Int,
+    val breakMin: Int,
+    val notif: Boolean,
+    val dark: Boolean
 )
 
 class ProfileViewModel : ViewModel() {
@@ -30,18 +38,26 @@ class ProfileViewModel : ViewModel() {
     init { loadProfile() }
 
     private fun loadProfile() = viewModelScope.launch {
-        val baseFlow = combine(
-            authRepository.getCurrentUser(),
+        val prefsFlow = combine(
             userPreferences.pomodoroMinutes,
             userPreferences.breakMinutes,
             userPreferences.notificationsEnabled,
+            userPreferences.isDarkMode
+        ) { pomodoro, breakMin, notif, dark ->
+            ProfilePrefsData(pomodoro, breakMin, notif, dark)
+        }
+
+        val baseFlow = combine(
+            authRepository.getCurrentUser(),
+            prefsFlow,
             focusSessionRepository.getTodayFocusMinutes()
-        ) { user, pomodoro, breakMin, notif, focusMin ->
+        ) { user, prefs, focusMin ->
             ProfileUiState(
                 user = user,
-                pomodoroMinutes = pomodoro,
-                breakMinutes = breakMin,
-                notificationsEnabled = notif,
+                pomodoroMinutes = prefs.pomodoro,
+                breakMinutes = prefs.breakMin,
+                notificationsEnabled = prefs.notif,
+                isDarkMode = prefs.dark,
                 totalFocusMinutes = focusMin,
                 isLoading = false
             )
@@ -62,6 +78,10 @@ class ProfileViewModel : ViewModel() {
 
     fun setNotificationsEnabled(enabled: Boolean) = viewModelScope.launch {
         userPreferences.saveNotificationEnabled(enabled)
+    }
+
+    fun setDarkMode(enabled: Boolean) = viewModelScope.launch {
+        userPreferences.saveDarkMode(enabled)
     }
 
     fun logout() = viewModelScope.launch { logoutUseCase() }

@@ -32,23 +32,23 @@ fun RegisterScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(WarmBackground)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(48.dp))
 
-        Text("Create Account", style = MaterialTheme.typography.headlineLarge, color = PrimaryText)
+        Text("Create Account", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground)
         Spacer(Modifier.height(6.dp))
-        Text("Join thousands of scholars achieving more.", style = MaterialTheme.typography.bodyMedium, color = SecondaryText, textAlign = TextAlign.Center)
+        Text("Join thousands of scholars achieving more.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
 
         Spacer(Modifier.height(32.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(4.dp)
         ) {
             Column(Modifier.padding(24.dp)) {
@@ -56,7 +56,7 @@ fun RegisterScreen(
                     Triple("Full Name", uiState.name, viewModel::onNameChange),
                     Triple("Email", uiState.email, viewModel::onEmailChange),
                 ).forEach { (label, value, onChange) ->
-                    Text(label, style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                    Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(Modifier.height(6.dp))
                     OutlinedTextField(
                         value = value, onValueChange = onChange,
@@ -66,15 +66,15 @@ fun RegisterScreen(
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
-                            focusedContainerColor = WarmBeige.copy(alpha = 0.4f),
-                            unfocusedContainerColor = WarmBeige.copy(alpha = 0.4f)
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                         )
                     )
                     Spacer(Modifier.height(16.dp))
                 }
 
                 // Password
-                Text("Password", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                Text("Password", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
                     value = uiState.password, onValueChange = viewModel::onPasswordChange,
@@ -83,20 +83,20 @@ fun RegisterScreen(
                     visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = viewModel::togglePasswordVisibility) {
-                            Icon(if (uiState.isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility, null, tint = SecondaryText)
+                            Icon(if (uiState.isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
-                        focusedContainerColor = WarmBeige.copy(alpha = 0.4f), unfocusedContainerColor = WarmBeige.copy(alpha = 0.4f)
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                     )
                 )
                 Spacer(Modifier.height(16.dp))
 
                 // Confirm Password
-                Text("Confirm Password", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                Text("Confirm Password", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
                     value = uiState.confirmPassword, onValueChange = viewModel::onConfirmPasswordChange,
@@ -107,7 +107,7 @@ fun RegisterScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
-                        focusedContainerColor = WarmBeige.copy(alpha = 0.4f), unfocusedContainerColor = WarmBeige.copy(alpha = 0.4f)
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                     )
                 )
 
@@ -135,7 +135,7 @@ fun RegisterScreen(
                 Spacer(Modifier.height(12.dp))
 
                 TextButton(onClick = onNavigateToLogin, modifier = Modifier.fillMaxWidth()) {
-                    Text("Already have an account? ", color = SecondaryText, style = MaterialTheme.typography.bodyMedium)
+                    Text("Already have an account? ", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                     Text("Login", color = PrimaryTerracotta, style = MaterialTheme.typography.bodyMedium)
                 }
             }

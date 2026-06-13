@@ -8,6 +8,7 @@ import com.example.focusbuddyapp.domain.model.Task
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -26,13 +27,14 @@ class TaskDetailViewModel(private val taskId: Int) : ViewModel() {
     private val _uiState = MutableStateFlow(TaskDetailUiState())
     val uiState: StateFlow<TaskDetailUiState> = _uiState.asStateFlow()
 
-    init { loadTask() }
+    init { observeTask() }
 
-    private fun loadTask() = viewModelScope.launch {
-        val task = readTaskUseCase(taskId)
-        _uiState.update {
-            if (task != null) it.copy(task = task, isLoading = false)
-            else it.copy(isLoading = false, errorMessage = "Task tidak ditemukan")
+    private fun observeTask() = viewModelScope.launch {
+        AppModule.taskRepository.getTaskByIdFlow(taskId).collect { task ->
+            _uiState.update {
+                if (task != null) it.copy(task = task, isLoading = false, errorMessage = null)
+                else it.copy(task = null, isLoading = false) // Do not override delete state error with not found if deleting
+            }
         }
     }
 
@@ -44,9 +46,7 @@ class TaskDetailViewModel(private val taskId: Int) : ViewModel() {
     fun toggleComplete() = viewModelScope.launch {
         val current = _uiState.value.task ?: return@launch
         val newIsCompleted = !current.isCompleted
-        val newProgress = if (newIsCompleted) 100 else 0
         toggleTaskCompleteUseCase(taskId, newIsCompleted)
-        _uiState.update { it.copy(task = current.copy(isCompleted = newIsCompleted, progressPercent = newProgress)) }
     }
 
     fun startTimerForTask() = viewModelScope.launch {

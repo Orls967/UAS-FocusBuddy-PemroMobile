@@ -58,14 +58,14 @@ class AuthRepositoryImpl(
         withContext(Dispatchers.IO) {
             runCatching {
                 seedUsersIfEmpty()
-                val userEntity = userDao.getUserByEmail(email)
+                val normalizedEmail = email.trim().lowercase()
+                val userEntity = userDao.getUserByEmail(normalizedEmail)
                     ?: throw Exception("Email tidak terdaftar")
                 if (userEntity.password != password) {
                     throw Exception("Password salah")
                 }
                 val token = "local-token-for-${userEntity.id}"
-                userPreferences.saveAuthToken(token)
-                userPreferences.saveUserInfo(userEntity.id, userEntity.name, userEntity.email)
+                userPreferences.saveLoginSession(token, userEntity.id, userEntity.name, userEntity.email)
                 userEntity.toDomain()
             }
         }
@@ -74,21 +74,21 @@ class AuthRepositoryImpl(
         withContext(Dispatchers.IO) {
             runCatching {
                 seedUsersIfEmpty()
-                val existing = userDao.getUserByEmail(email)
+                val normalizedEmail = email.trim().lowercase()
+                val existing = userDao.getUserByEmail(normalizedEmail)
                 if (existing != null) {
                     throw Exception("Email sudah terdaftar")
                 }
                 val userEntity = com.example.focusbuddyapp.data.local.entity.UserEntity(
-                    name = name,
-                    email = email,
+                    name = name.trim(),
+                    email = normalizedEmail,
                     password = password
                 )
                 val newId = userDao.insertUser(userEntity)
                 val finalUser = userEntity.copy(id = newId.toInt()).toDomain()
                 
                 val token = "local-token-for-${newId}"
-                userPreferences.saveAuthToken(token)
-                userPreferences.saveUserInfo(finalUser.id, finalUser.name, finalUser.email)
+                userPreferences.saveLoginSession(token, finalUser.id, finalUser.name, finalUser.email)
                 finalUser
             }
         }

@@ -25,7 +25,28 @@ import androidx.compose.ui.draw.clip
 fun FocusScreen(viewModel: FocusViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(containerColor = WarmBackground) { paddingValues ->
+    if (uiState.showBreakDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissBreakDialog() },
+            title = { Text("Focus Session Complete!") },
+            text = { Text("Hebat! Sesi focus Anda telah selesai. Apakah Anda ingin memulai waktu istirahat selama ${uiState.breakDurationMinutes} menit?") },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.startBreak() },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Start Break")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.skipBreak() }) {
+                    Text("Skip Break")
+                }
+            }
+        )
+    }
+
+    Scaffold(containerColor = MaterialTheme.colorScheme.background) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -37,25 +58,7 @@ fun FocusScreen(viewModel: FocusViewModel) {
 
             // App bar
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("Focus Session", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
-                Spacer(Modifier.weight(1f))
-                Box(
-                    Modifier.size(36.dp).clip(CircleShape).background(SurfaceDim),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (uiState.profilePhotoUri != null) {
-                        AsyncImage(
-                            model = uiState.profilePhotoUri,
-                            contentDescription = "Profile Photo",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Icon(Icons.Filled.Person, null, tint = PrimaryNavy, modifier = Modifier.size(20.dp))
-                    }
-                }
+                Text("Focus Session", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
             }
 
             Spacer(Modifier.height(32.dp))
@@ -66,22 +69,33 @@ fun FocusScreen(viewModel: FocusViewModel) {
                 label = uiState.modeLabel,
                 progress = uiState.progress,
                 size = 260.dp,
-                strokeWidth = 12.dp
+                strokeWidth = 12.dp,
+                progressColor = if (uiState.isBreakMode) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
             )
 
             Spacer(Modifier.height(24.dp))
+
+            if (uiState.isBreakMode) {
+                LinearProgressIndicator(
+                    progress = { uiState.progress },
+                    modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(50)),
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+                Spacer(Modifier.height(16.dp))
+            }
 
             // Current task card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(SurfaceWhite),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("CURRENT TASK", style = MaterialTheme.typography.labelMedium, color = SecondaryText)
+                    Text("CURRENT TASK", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(4.dp))
-                    Text(uiState.currentTaskTitle, style = MaterialTheme.typography.titleLarge, color = PrimaryText)
+                    Text(uiState.currentTaskTitle, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
                 }
             }
 
@@ -93,7 +107,7 @@ fun FocusScreen(viewModel: FocusViewModel) {
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 enabled = uiState.timerState != TimerState.RUNNING,
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryNavy)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Icon(Icons.Filled.PlayArrow, null, tint = Color.White)
                 Spacer(Modifier.width(8.dp))
@@ -118,7 +132,7 @@ fun FocusScreen(viewModel: FocusViewModel) {
                     modifier = Modifier.weight(1f).height(48.dp),
                     enabled = uiState.timerState != TimerState.IDLE,
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryTerracotta)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
                     Icon(Icons.Filled.Stop, null, tint = Color.White)
                     Spacer(Modifier.width(4.dp))
@@ -129,7 +143,7 @@ fun FocusScreen(viewModel: FocusViewModel) {
             Spacer(Modifier.height(20.dp))
 
             // Break duration selector
-            Text("Break Duration", style = MaterialTheme.typography.labelLarge, color = SecondaryText)
+            Text("Break Duration", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 listOf(5, 10).forEach { minutes ->
@@ -137,9 +151,9 @@ fun FocusScreen(viewModel: FocusViewModel) {
                         RadioButton(
                             selected = uiState.breakDurationMinutes == minutes,
                             onClick = { viewModel.setBreakDuration(minutes) },
-                            colors = RadioButtonDefaults.colors(selectedColor = PrimaryNavy)
+                            colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
                         )
-                        Text("$minutes Minutes", style = MaterialTheme.typography.bodyMedium, color = PrimaryText)
+                        Text("$minutes Minutes", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
             }
@@ -172,12 +186,12 @@ private fun StatBox(
     value: String,
     label: String
 ) {
-    Card(modifier = modifier, shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(SurfaceContainer)) {
+    Card(modifier = modifier, shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(icon, null, tint = PrimaryNavy, modifier = Modifier.size(24.dp))
+            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
             Spacer(Modifier.height(4.dp))
-            Text(value, style = MaterialTheme.typography.titleLarge, color = PrimaryText, fontWeight = FontWeight.Bold)
-            Text(label, style = MaterialTheme.typography.bodySmall, color = SecondaryText)
+            Text(value, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold)
+            Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

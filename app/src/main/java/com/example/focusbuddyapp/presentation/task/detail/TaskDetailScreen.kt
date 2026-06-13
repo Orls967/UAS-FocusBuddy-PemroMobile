@@ -43,16 +43,16 @@ fun TaskDetailScreen(
                 },
                 actions = {
                     IconButton(onClick = onNavigateToEdit) {
-                        Icon(Icons.Filled.Edit, "Edit", tint = SecondaryText)
+                        Icon(Icons.Filled.Edit, "Edit", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     IconButton(onClick = viewModel::deleteTask) {
                         Icon(Icons.Filled.Delete, "Delete", tint = PrimaryTerracotta)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBackground)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = WarmBackground
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         if (uiState.isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -71,23 +71,23 @@ fun TaskDetailScreen(
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
             // Task header card
-            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(SurfaceWhite), elevation = CardDefaults.cardElevation(2.dp)) {
+            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                 Column(Modifier.padding(16.dp)) {
                     PriorityChip(priority = task.priority)
                     Spacer(Modifier.height(8.dp))
-                    Text(task.title, style = MaterialTheme.typography.headlineSmall, color = PrimaryText)
+                    Text(task.title, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(Modifier.height(4.dp))
                     task.dueDate?.let { date ->
                         val fmt = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.CalendarToday, null, tint = SecondaryText, modifier = Modifier.size(14.dp))
+                            Icon(Icons.Filled.CalendarToday, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(14.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("Due: ${fmt.format(Date(date))}", style = MaterialTheme.typography.bodySmall, color = SecondaryText)
+                            Text("Due: ${fmt.format(Date(date))}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     if (task.category.isNotBlank()) {
                         Spacer(Modifier.height(2.dp))
-                        Text(task.category, style = MaterialTheme.typography.bodySmall, color = SecondaryText)
+                        Text(task.category, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -96,15 +96,15 @@ fun TaskDetailScreen(
 
             // Description
             if (task.description.isNotBlank()) {
-                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(SurfaceWhite), elevation = CardDefaults.cardElevation(2.dp)) {
+                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                     Column(Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.Description, null, tint = SecondaryText, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Filled.Description, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("Description", style = MaterialTheme.typography.titleSmall, color = PrimaryText)
+                            Text("Description", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
                         }
                         Spacer(Modifier.height(8.dp))
-                        Text(task.description, style = MaterialTheme.typography.bodyMedium, color = PrimaryText)
+                        Text(task.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
                 Spacer(Modifier.height(12.dp))
@@ -134,13 +134,13 @@ fun TaskDetailScreen(
             // Sub-tasks
             if (task.subTasks.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
-                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(SurfaceWhite), elevation = CardDefaults.cardElevation(2.dp)) {
+                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                     Column(Modifier.padding(16.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Checklist, null, tint = SecondaryText, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Filled.Checklist, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(6.dp))
-                                Text("Sub-tasks", style = MaterialTheme.typography.titleSmall, color = PrimaryText)
+                                Text("Sub-tasks", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
                             }
                             TextButton(onClick = {}) { Text("+ New Sub-task", color = PrimaryTerracotta) }
                         }
@@ -155,7 +155,7 @@ fun TaskDetailScreen(
                                 Text(
                                     text = subTask.title,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = if (subTask.isCompleted) SecondaryText else PrimaryText,
+                                    color = if (subTask.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onBackground,
                                     textDecoration = if (subTask.isCompleted) TextDecoration.LineThrough else null,
                                     modifier = Modifier.weight(1f)
                                 )
@@ -178,12 +178,12 @@ fun TaskDetailScreen(
                 modifier = Modifier.fillMaxWidth().height(48.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (task.isCompleted) SurfaceContainer else SuccessGreen
+                    containerColor = if (task.isCompleted) MaterialTheme.colorScheme.surfaceVariant else SuccessGreen
                 )
             ) {
                 Text(
                     if (task.isCompleted) "Mark Incomplete" else "Mark Complete",
-                    color = if (task.isCompleted) SecondaryText else Color.White
+                    color = if (task.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else Color.White
                 )
             }
 

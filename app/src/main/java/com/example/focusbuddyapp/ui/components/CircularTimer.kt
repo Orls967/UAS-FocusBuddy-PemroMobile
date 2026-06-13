@@ -26,8 +26,8 @@ fun CircularTimer(
     progress: Float,           // 0f..1f
     size: Dp = 240.dp,
     strokeWidth: Dp = 12.dp,
-    trackColor: Color = WarmBeige,
-    progressColor: Color = PrimaryNavy,
+    trackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    progressColor: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -69,12 +69,12 @@ fun CircularTimer(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
-                color = com.example.focusbuddyapp.ui.theme.SecondaryText
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = timeText,
                 style = MaterialTheme.typography.headlineLarge.copy(fontSize = 42.sp),
-                color = PrimaryNavy
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }

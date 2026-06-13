@@ -33,6 +33,9 @@ class TaskRepositoryImpl(
         taskDao.getTaskById(id)?.toDomain()
     }
 
+    override fun getTaskByIdFlow(id: Int): Flow<Task?> =
+        taskDao.getTaskByIdFlow(id).map { it?.toDomain() }
+
     // ── BREAD: Add ────────────────────────────────────────────────────────────
     override suspend fun addTask(task: Task): Long = withContext(Dispatchers.IO) {
         val id = taskDao.insertTask(task.toEntity())

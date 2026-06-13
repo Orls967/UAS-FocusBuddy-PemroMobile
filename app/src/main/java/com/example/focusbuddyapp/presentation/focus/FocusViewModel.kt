@@ -25,7 +25,9 @@ data class FocusUiState(
     val todayFocusMinutes: Int = 0,
     val efficiencyPercent: Int = 85,
     val activeSessionId: Int? = null,
-    val profilePhotoUri: String? = null
+    val profilePhotoUri: String? = null,
+    val isBreakMode: Boolean = false,
+    val showBreakDialog: Boolean = false
 ) {
     val progress: Float get() = 1f - (remainingSeconds.toFloat() / totalSeconds)
     val timerText: String get() {
@@ -33,7 +35,7 @@ data class FocusUiState(
         val s = remainingSeconds % 60
         return "%02d:%02d".format(m, s)
     }
-    val modeLabel: String get() = "DEEP\nWORK"
+    val modeLabel: String get() = if (isBreakMode) "BREAK\nTIME" else "DEEP\nWORK"
 }
 
 class FocusViewModel : ViewModel() {
@@ -104,17 +106,73 @@ class FocusViewModel : ViewModel() {
     }
 
     fun stopTimer() = viewModelScope.launch {
+        stopSessionAndReset(showDialogAfter = false)
+    }
+
+    fun startBreak() {
+        timerJob?.cancel()
+        val totalSecs = _uiState.value.breakDurationMinutes * 60
+        _uiState.update {
+            it.copy(
+                isBreakMode = true,
+                showBreakDialog = false,
+                totalSeconds = totalSecs,
+                remainingSeconds = totalSecs,
+                timerState = TimerState.RUNNING
+            )
+        }
+        runTimer()
+    }
+
+    fun skipBreak() {
+        resetToIdle()
+    }
+
+    fun dismissBreakDialog() {
+        _uiState.update { it.copy(showBreakDialog = false) }
+    }
+
+    private fun resetToIdle() = viewModelScope.launch {
+        timerJob?.cancel()
+        val pomodoroMinutes = AppModule.userPreferences.pomodoroMinutes.first()
+        val totalSecs = pomodoroMinutes * 60
+        _uiState.update {
+            it.copy(
+                isBreakMode = false,
+                showBreakDialog = false,
+                timerState = TimerState.IDLE,
+                totalSeconds = totalSecs,
+                remainingSeconds = totalSecs,
+                activeSessionId = null
+            )
+        }
+    }
+
+    private suspend fun stopSessionAndReset(showDialogAfter: Boolean) {
         timerJob?.cancel()
         val state = _uiState.value
-        state.activeSessionId?.let { id ->
-            val session = FocusSession(
-                id = id,
-                durationMinutes = (state.totalSeconds - state.remainingSeconds) / 60,
-                startTime = System.currentTimeMillis() - (state.totalSeconds - state.remainingSeconds) * 1000L
-            )
-            stopSessionUseCase(session)
+        if (!state.isBreakMode) {
+            state.activeSessionId?.let { id ->
+                val session = FocusSession(
+                    id = id,
+                    durationMinutes = (state.totalSeconds - state.remainingSeconds) / 60,
+                    startTime = System.currentTimeMillis() - (state.totalSeconds - state.remainingSeconds) * 1000L
+                )
+                stopSessionUseCase(session)
+            }
         }
-        _uiState.update { it.copy(timerState = TimerState.IDLE, remainingSeconds = it.totalSeconds, activeSessionId = null) }
+        val pomodoroMinutes = AppModule.userPreferences.pomodoroMinutes.first()
+        val totalSecs = pomodoroMinutes * 60
+        _uiState.update {
+            it.copy(
+                timerState = TimerState.IDLE,
+                isBreakMode = false,
+                showBreakDialog = showDialogAfter,
+                remainingSeconds = totalSecs,
+                totalSeconds = totalSecs,
+                activeSessionId = null
+            )
+        }
     }
 
     fun setBreakDuration(minutes: Int) = _uiState.update { it.copy(breakDurationMinutes = minutes) }
@@ -127,7 +185,11 @@ class FocusViewModel : ViewModel() {
                 _uiState.update { it.copy(remainingSeconds = it.remainingSeconds - 1) }
             }
             if (_uiState.value.remainingSeconds == 0) {
-                stopTimer()
+                if (!_uiState.value.isBreakMode) {
+                    stopSessionAndReset(showDialogAfter = true)
+                } else {
+                    resetToIdle()
+                }
             }
         }
     }

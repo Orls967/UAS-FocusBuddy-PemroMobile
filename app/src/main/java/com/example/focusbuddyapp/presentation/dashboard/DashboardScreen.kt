@@ -29,21 +29,14 @@ fun DashboardScreen(
     onNavigateToAddTask: () -> Unit,
     onNavigateToTask: (Int) -> Unit,
     onNavigateToTimer: () -> Unit,
+    onNavigateToTaskList: () -> Unit,
     onLogout: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusProgress = (uiState.todayFocusMinutes.toFloat() / uiState.dailyGoalMinutes).coerceIn(0f, 1f)
 
     Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onNavigateToAddTask,
-                containerColor = PrimaryNavy,
-                contentColor = Color.White,
-                shape = CircleShape
-            ) { Icon(Icons.Filled.Add, "Add Task") }
-        },
-        containerColor = WarmBackground
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -57,7 +50,7 @@ fun DashboardScreen(
             // Header
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    Modifier.size(44.dp).clip(CircleShape).background(SurfaceDim),
+                    Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     if (uiState.profilePhotoUri != null) {
@@ -75,37 +68,34 @@ fun DashboardScreen(
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Hello, ${uiState.userName.ifBlank { "Scholar" }}", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
-                }
-                IconButton(onClick = {}) {
-                    Icon(Icons.Filled.Settings, null, tint = SecondaryText)
+                    Text("Hello, ${uiState.userName.ifBlank { "Scholar" }}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
                 }
             }
 
             Spacer(Modifier.height(20.dp))
 
             // Tasks completed card
-            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(SurfaceWhite), elevation = CardDefaults.cardElevation(2.dp)) {
+            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                 Column(Modifier.padding(16.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("TASKS", style = MaterialTheme.typography.labelMedium, color = SecondaryText)
-                        Icon(Icons.Filled.Assignment, null, tint = SecondaryText, modifier = Modifier.size(18.dp))
+                        Text("TASKS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(Icons.Filled.Assignment, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                     }
                     Spacer(Modifier.height(4.dp))
-                    Text("${uiState.completedTodayCount}", style = MaterialTheme.typography.headlineLarge, color = PrimaryText)
-                    Text("Completed Today", style = MaterialTheme.typography.bodyMedium, color = PrimaryText)
-                    Text("${uiState.totalThisWeekCount} Total This Week", style = MaterialTheme.typography.bodySmall, color = SecondaryText)
+                    Text("${uiState.completedTodayCount}", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground)
+                    Text("Completed Today", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+                    Text("${uiState.totalThisWeekCount} Total This Week", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
             Spacer(Modifier.height(12.dp))
 
             // Focus progress card
-            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(SurfaceWhite), elevation = CardDefaults.cardElevation(2.dp)) {
+            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                 Column(Modifier.padding(16.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("YOUR PROGRESS", style = MaterialTheme.typography.labelMedium, color = SecondaryText)
-                        Icon(Icons.Filled.Timer, null, tint = SecondaryText, modifier = Modifier.size(18.dp))
+                        Text("YOUR PROGRESS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(Icons.Filled.Timer, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                     }
                     Spacer(Modifier.height(4.dp))
                     val focusHours = uiState.todayFocusMinutes / 60
@@ -113,7 +103,7 @@ fun DashboardScreen(
                     val goalHours = uiState.dailyGoalMinutes / 60
                     val goalMin = uiState.dailyGoalMinutes % 60
                     Row(verticalAlignment = Alignment.Bottom) {
-                        Text("${focusHours}h", style = MaterialTheme.typography.headlineLarge, color = PrimaryText)
+                        Text("${focusHours}h", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground)
                         Spacer(Modifier.width(4.dp))
                         Text("${goalHours}h ${goalMin}m", style = MaterialTheme.typography.titleMedium, color = PrimaryTerracotta)
                     }
@@ -122,10 +112,10 @@ fun DashboardScreen(
                         progress = { focusProgress },
                         modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(50)),
                         color = PrimaryNavy,
-                        trackColor = SurfaceContainer
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                     Spacer(Modifier.height(4.dp))
-                    Text("${uiState.weeklyFocusMinutes / 60}h Total This Week", style = MaterialTheme.typography.bodySmall, color = SecondaryText)
+                    Text("${uiState.weeklyFocusMinutes / 60}h Total This Week", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -157,7 +147,7 @@ fun DashboardScreen(
             // Motivational quote
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = WarmBeige),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                 elevation = CardDefaults.cardElevation(1.dp)
             ) {
                 Column(Modifier.padding(16.dp)) {
@@ -166,10 +156,10 @@ fun DashboardScreen(
                     Text(
                         text = "\"${uiState.quote.content}\"",
                         style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
-                        color = PrimaryText
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(Modifier.height(6.dp))
-                    Text("— ${uiState.quote.author}", style = MaterialTheme.typography.labelMedium, color = SecondaryText)
+                    Text("— ${uiState.quote.author}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -177,14 +167,14 @@ fun DashboardScreen(
 
             // Today's tasks
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("Today's Tasks", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
-                TextButton(onClick = {}) { Text("View All →", color = PrimaryTerracotta) }
+                Text("Today's Tasks", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+                TextButton(onClick = onNavigateToTaskList) { Text("View All →", color = PrimaryTerracotta) }
             }
 
             Spacer(Modifier.height(8.dp))
 
             if (uiState.todayTasks.isEmpty()) {
-                Text("No tasks for today. Add one!", color = SecondaryText, style = MaterialTheme.typography.bodyMedium)
+                Text("No tasks for today. Add one!", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
             } else {
                 uiState.todayTasks.forEach { task ->
                     DashboardTaskItem(task = task, onClick = { onNavigateToTask(task.id) })
@@ -202,7 +192,7 @@ private fun DashboardTaskItem(task: Task, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(SurfaceWhite),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
         Row(Modifier.padding(12.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -213,9 +203,9 @@ private fun DashboardTaskItem(task: Task, onClick: () -> Unit) {
             )
             Spacer(Modifier.width(8.dp))
             Column(Modifier.weight(1f)) {
-                Text(task.title, style = MaterialTheme.typography.titleSmall, color = PrimaryText, maxLines = 2)
+                Text(task.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground, maxLines = 2)
                 if (task.description.isNotBlank())
-                    Text(task.description, style = MaterialTheme.typography.bodySmall, color = SecondaryText, maxLines = 1)
+                    Text(task.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
             }
             Spacer(Modifier.width(8.dp))
             PriorityChip(priority = task.priority)

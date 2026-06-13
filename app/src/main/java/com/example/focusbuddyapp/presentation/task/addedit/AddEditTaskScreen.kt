@@ -38,10 +38,10 @@ fun AddEditTaskScreen(
                 navigationIcon = {
                     IconButton(onClick = onCancel) { Icon(Icons.Filled.Close, "Cancel") }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBackground)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = WarmBackground
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -55,31 +55,31 @@ fun AddEditTaskScreen(
             // Main form card
             Card(
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(SurfaceWhite),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(Modifier.padding(20.dp)) {
 
                     // Task Title
-                    Text("Task Title", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                    Text("Task Title", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(Modifier.height(6.dp))
                     OutlinedTextField(
                         value = uiState.title,
                         onValueChange = viewModel::onTitleChange,
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("e.g., Advanced Microeconomics Research", color = SecondaryText) },
+                        placeholder = { Text("e.g., Advanced Microeconomics Research", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
-                            focusedContainerColor = WarmBeige.copy(0.4f), unfocusedContainerColor = WarmBeige.copy(0.4f)
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
                         )
                     )
 
                     Spacer(Modifier.height(16.dp))
 
                     // Category dropdown
-                    Text("Category", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                    Text("Category", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(Modifier.height(6.dp))
                     var expanded by remember { mutableStateOf(false) }
                     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
@@ -92,7 +92,7 @@ fun AddEditTaskScreen(
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
-                                focusedContainerColor = WarmBeige.copy(0.4f), unfocusedContainerColor = WarmBeige.copy(0.4f)
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
                             )
                         )
                         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -108,7 +108,7 @@ fun AddEditTaskScreen(
                     Spacer(Modifier.height(16.dp))
 
                     // Priority
-                    Text("Priority Level", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                    Text("Priority Level", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Priority.values().forEach { priority ->
@@ -128,8 +128,8 @@ fun AddEditTaskScreen(
                                         Priority.MEDIUM -> PriorityMedText
                                         Priority.LOW    -> PriorityLowText
                                     },
-                                    containerColor = SurfaceContainer,
-                                    labelColor = SecondaryText
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             )
                         }
@@ -138,17 +138,17 @@ fun AddEditTaskScreen(
                     Spacer(Modifier.height(16.dp))
 
                     // Study Notes
-                    Text("Study Notes", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                    Text("Study Notes", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(Modifier.height(6.dp))
                     OutlinedTextField(
                         value = uiState.studyNotes,
                         onValueChange = viewModel::onStudyNotesChange,
                         modifier = Modifier.fillMaxWidth().height(120.dp),
-                        placeholder = { Text("List specific resources or sub-tasks here...", color = SecondaryText) },
+                        placeholder = { Text("List specific resources or sub-tasks here...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
-                            focusedContainerColor = WarmBeige.copy(0.4f), unfocusedContainerColor = WarmBeige.copy(0.4f)
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
                         )
                     )
                 }

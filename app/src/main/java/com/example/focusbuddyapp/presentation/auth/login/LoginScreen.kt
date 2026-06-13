@@ -36,7 +36,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(WarmBackground)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -55,12 +55,12 @@ fun LoginScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        Text("Welcome Back", style = MaterialTheme.typography.headlineLarge, color = PrimaryText)
+        Text("Welcome Back", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground)
         Spacer(Modifier.height(6.dp))
         Text(
             text = "Ready to dive back into your focus session, Scholar?",
             style = MaterialTheme.typography.bodyMedium,
-            color = SecondaryText,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
 
@@ -70,18 +70,18 @@ fun LoginScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(Modifier.padding(24.dp)) {
-                Text("Email Address", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                Text("Email Address", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
                     value = uiState.email,
                     onValueChange = viewModel::onEmailChange,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("name@university.edu", color = SecondaryText) },
-                    leadingIcon = { Icon(Icons.Filled.Email, null, tint = SecondaryText) },
+                    placeholder = { Text("name@university.edu", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    leadingIcon = { Icon(Icons.Filled.Email, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,
@@ -92,27 +92,27 @@ fun LoginScreen(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = PrimaryNavy,
                         unfocusedBorderColor = OutlineVariant,
-                        focusedContainerColor = WarmBeige.copy(alpha = 0.4f),
-                        unfocusedContainerColor = WarmBeige.copy(alpha = 0.4f)
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                     )
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                Text("Password", style = MaterialTheme.typography.labelLarge, color = PrimaryText)
+                Text("Password", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
                     value = uiState.password,
                     onValueChange = viewModel::onPasswordChange,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("••••••••", color = SecondaryText) },
-                    leadingIcon = { Icon(Icons.Filled.Lock, null, tint = SecondaryText) },
+                    placeholder = { Text("••••••••", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    leadingIcon = { Icon(Icons.Filled.Lock, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
                     trailingIcon = {
                         IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(
                                 if (uiState.isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                                 contentDescription = "Toggle password",
-                                tint = SecondaryText
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     },
@@ -130,8 +130,8 @@ fun LoginScreen(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = PrimaryNavy,
                         unfocusedBorderColor = OutlineVariant,
-                        focusedContainerColor = WarmBeige.copy(alpha = 0.4f),
-                        unfocusedContainerColor = WarmBeige.copy(alpha = 0.4f)
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                     )
                 )
 
@@ -163,7 +163,7 @@ fun LoginScreen(
                     onClick = onNavigateToRegister,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Don't have an account? ", color = SecondaryText, style = MaterialTheme.typography.bodyMedium)
+                    Text("Don't have an account? ", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                     Text("Sign Up!", color = PrimaryTerracotta, style = MaterialTheme.typography.bodyMedium)
                 }
             }

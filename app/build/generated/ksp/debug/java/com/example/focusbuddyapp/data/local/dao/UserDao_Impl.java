@@ -204,7 +204,7 @@ public final class UserDao_Impl implements UserDao {
   @Override
   public Object getUserByEmail(final String email,
       final Continuation<? super UserEntity> $completion) {
-    final String _sql = "SELECT * FROM users WHERE email = ? LIMIT 1";
+    final String _sql = "SELECT * FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
     int _argIndex = 1;
     _statement.bindString(_argIndex, email);

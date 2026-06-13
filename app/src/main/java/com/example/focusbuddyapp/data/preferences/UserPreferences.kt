@@ -24,6 +24,7 @@ class UserPreferences(private val context: Context) {
         val PROFILE_PHOTO_URI = stringPreferencesKey("profile_photo_uri")
         val ACTIVE_TASK_ID = intPreferencesKey("active_task_id")
         val ACTIVE_TASK_TITLE = stringPreferencesKey("active_task_title")
+        val DARK_MODE = booleanPreferencesKey("dark_mode")
     }
 
     // Auth token
@@ -42,6 +43,7 @@ class UserPreferences(private val context: Context) {
     val profilePhotoUri: Flow<String?> = context.dataStore.data.map { it[PROFILE_PHOTO_URI] }
     val activeTaskId: Flow<Int> = context.dataStore.data.map { it[ACTIVE_TASK_ID] ?: 0 }
     val activeTaskTitle: Flow<String> = context.dataStore.data.map { it[ACTIVE_TASK_TITLE] ?: "" }
+    val isDarkMode: Flow<Boolean> = context.dataStore.data.map { it[DARK_MODE] ?: false }
 
     suspend fun saveAuthToken(token: String) {
         context.dataStore.edit { it[AUTH_TOKEN] = token }
@@ -55,6 +57,16 @@ class UserPreferences(private val context: Context) {
         }
     }
 
+    suspend fun saveLoginSession(token: String, id: Int, name: String, email: String) {
+        context.dataStore.edit {
+            it[AUTH_TOKEN] = token
+            it[USER_ID]    = id
+            it[USER_NAME]  = name
+            it[USER_EMAIL] = email
+        }
+    }
+
+
     suspend fun saveFocusSettings(pomodoroMin: Int, breakMin: Int) {
         context.dataStore.edit {
             it[POMODORO_MIN] = pomodoroMin
@@ -64,6 +76,10 @@ class UserPreferences(private val context: Context) {
 
     suspend fun saveNotificationEnabled(enabled: Boolean) {
         context.dataStore.edit { it[NOTIF_ENABLED] = enabled }
+    }
+
+    suspend fun saveDarkMode(enabled: Boolean) {
+        context.dataStore.edit { it[DARK_MODE] = enabled }
     }
 
     suspend fun saveProfilePhotoUri(uri: String?) {

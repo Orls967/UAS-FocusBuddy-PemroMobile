@@ -12,13 +12,15 @@ class RegisterUseCase(private val authRepository: AuthRepository) {
         confirmPassword: String
     ): Result<User> {
         if (name.isBlank()) return Result.failure(Exception("Nama tidak boleh kosong"))
+        if (!name.any { it.isLetter() }) return Result.failure(Exception("Nama harus mengandung minimal 1 huruf"))
         if (email.isBlank()) return Result.failure(Exception("Email tidak boleh kosong"))
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        val normalizedEmail = email.trim().lowercase()
+        if (!Patterns.EMAIL_ADDRESS.matcher(normalizedEmail).matches()) {
             return Result.failure(Exception("Format email tidak valid"))
         }
         if (password.isBlank()) return Result.failure(Exception("Password tidak boleh kosong"))
         if (password.length < 6) return Result.failure(Exception("Password minimal 6 karakter"))
         if (password != confirmPassword) return Result.failure(Exception("Konfirmasi password tidak sesuai"))
-        return authRepository.register(name.trim(), email.trim(), password)
+        return authRepository.register(name.trim(), normalizedEmail, password)
     }
 }

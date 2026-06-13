@@ -7,11 +7,12 @@ import android.util.Patterns
 class LoginUseCase(private val authRepository: AuthRepository) {
     suspend operator fun invoke(email: String, password: String): Result<User> {
         if (email.isBlank()) return Result.failure(Exception("Email tidak boleh kosong"))
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        val normalizedEmail = email.trim().lowercase()
+        if (!Patterns.EMAIL_ADDRESS.matcher(normalizedEmail).matches()) {
             return Result.failure(Exception("Format email tidak valid"))
         }
         if (password.isBlank()) return Result.failure(Exception("Password tidak boleh kosong"))
         if (password.length < 6) return Result.failure(Exception("Password minimal 6 karakter"))
-        return authRepository.login(email.trim(), password)
+        return authRepository.login(normalizedEmail, password)
     }
 }

@@ -454,6 +454,94 @@ public final class TaskDao_Impl implements TaskDao {
   }
 
   @Override
+  public Flow<TaskEntity> getTaskByIdFlow(final int id) {
+    final String _sql = "SELECT * FROM tasks WHERE id = ? LIMIT 1";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, id);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"tasks"}, new Callable<TaskEntity>() {
+      @Override
+      @Nullable
+      public TaskEntity call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfTitle = CursorUtil.getColumnIndexOrThrow(_cursor, "title");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final int _cursorIndexOfCategory = CursorUtil.getColumnIndexOrThrow(_cursor, "category");
+          final int _cursorIndexOfPriority = CursorUtil.getColumnIndexOrThrow(_cursor, "priority");
+          final int _cursorIndexOfDueDate = CursorUtil.getColumnIndexOrThrow(_cursor, "due_date");
+          final int _cursorIndexOfDueTime = CursorUtil.getColumnIndexOrThrow(_cursor, "due_time");
+          final int _cursorIndexOfIsCompleted = CursorUtil.getColumnIndexOrThrow(_cursor, "is_completed");
+          final int _cursorIndexOfProgressPercent = CursorUtil.getColumnIndexOrThrow(_cursor, "progress_percent");
+          final int _cursorIndexOfStudyNotes = CursorUtil.getColumnIndexOrThrow(_cursor, "study_notes");
+          final int _cursorIndexOfRemoteId = CursorUtil.getColumnIndexOrThrow(_cursor, "remote_id");
+          final int _cursorIndexOfSyncedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "synced_at");
+          final int _cursorIndexOfUserId = CursorUtil.getColumnIndexOrThrow(_cursor, "user_id");
+          final TaskEntity _result;
+          if (_cursor.moveToFirst()) {
+            final int _tmpId;
+            _tmpId = _cursor.getInt(_cursorIndexOfId);
+            final String _tmpTitle;
+            _tmpTitle = _cursor.getString(_cursorIndexOfTitle);
+            final String _tmpDescription;
+            _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            final String _tmpCategory;
+            _tmpCategory = _cursor.getString(_cursorIndexOfCategory);
+            final String _tmpPriority;
+            _tmpPriority = _cursor.getString(_cursorIndexOfPriority);
+            final Long _tmpDueDate;
+            if (_cursor.isNull(_cursorIndexOfDueDate)) {
+              _tmpDueDate = null;
+            } else {
+              _tmpDueDate = _cursor.getLong(_cursorIndexOfDueDate);
+            }
+            final String _tmpDueTime;
+            if (_cursor.isNull(_cursorIndexOfDueTime)) {
+              _tmpDueTime = null;
+            } else {
+              _tmpDueTime = _cursor.getString(_cursorIndexOfDueTime);
+            }
+            final boolean _tmpIsCompleted;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfIsCompleted);
+            _tmpIsCompleted = _tmp != 0;
+            final int _tmpProgressPercent;
+            _tmpProgressPercent = _cursor.getInt(_cursorIndexOfProgressPercent);
+            final String _tmpStudyNotes;
+            _tmpStudyNotes = _cursor.getString(_cursorIndexOfStudyNotes);
+            final String _tmpRemoteId;
+            if (_cursor.isNull(_cursorIndexOfRemoteId)) {
+              _tmpRemoteId = null;
+            } else {
+              _tmpRemoteId = _cursor.getString(_cursorIndexOfRemoteId);
+            }
+            final Long _tmpSyncedAt;
+            if (_cursor.isNull(_cursorIndexOfSyncedAt)) {
+              _tmpSyncedAt = null;
+            } else {
+              _tmpSyncedAt = _cursor.getLong(_cursorIndexOfSyncedAt);
+            }
+            final int _tmpUserId;
+            _tmpUserId = _cursor.getInt(_cursorIndexOfUserId);
+            _result = new TaskEntity(_tmpId,_tmpTitle,_tmpDescription,_tmpCategory,_tmpPriority,_tmpDueDate,_tmpDueTime,_tmpIsCompleted,_tmpProgressPercent,_tmpStudyNotes,_tmpRemoteId,_tmpSyncedAt,_tmpUserId);
+          } else {
+            _result = null;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
   public Flow<List<TaskEntity>> searchTasks(final String query) {
     final String _sql = "SELECT * FROM tasks WHERE title LIKE '%' || ? || '%' OR description LIKE '%' || ? || '%' ORDER BY due_date ASC";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);

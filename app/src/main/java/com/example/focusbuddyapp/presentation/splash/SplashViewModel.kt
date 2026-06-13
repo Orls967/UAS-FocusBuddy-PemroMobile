@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 sealed interface SplashUiState {
@@ -26,10 +27,26 @@ class SplashViewModel : ViewModel() {
 
     private fun checkAuthState() = viewModelScope.launch {
         delay(1800) // Show splash for at least 1.8s
-        _uiState.value = if (AppModule.authRepository.isLoggedIn()) {
-            SplashUiState.NavigateToDashboard
+        
+        val token = AppModule.authRepository.getAuthToken()
+        val userId = try {
+            AppModule.userPreferences.userId.first()
+        } catch (e: Exception) {
+            0
+        }
+        
+        val isValid = if (!token.isNullOrEmpty() && userId > 0) {
+            val user = AppModule.userDao.getUserById(userId)
+            user != null
         } else {
-            SplashUiState.NavigateToLogin
+            false
+        }
+        
+        if (isValid) {
+            _uiState.value = SplashUiState.NavigateToDashboard
+        } else {
+            AppModule.userPreferences.clearAll()
+            _uiState.value = SplashUiState.NavigateToLogin
         }
     }
 }

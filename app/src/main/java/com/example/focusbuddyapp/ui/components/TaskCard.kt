@@ -27,7 +27,7 @@ fun TaskCard(
     modifier: Modifier = Modifier
 ) {
     val borderColor by animateColorAsState(
-        targetValue = if (!task.isCompleted) PrimaryNavy else SuccessGreen,
+        targetValue = if (!task.isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
         label = "task_border"
     )
 
@@ -36,7 +36,7 @@ fun TaskCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -54,9 +54,9 @@ fun TaskCard(
                 checked = task.isCompleted,
                 onCheckedChange = onCheckedChange,
                 colors = CheckboxDefaults.colors(
-                    checkedColor = SuccessGreen,
-                    uncheckedColor = OutlineVariant,
-                    checkmarkColor = SurfaceWhite
+                    checkedColor = MaterialTheme.colorScheme.tertiary,
+                    uncheckedColor = MaterialTheme.colorScheme.outline,
+                    checkmarkColor = MaterialTheme.colorScheme.onTertiary
                 )
             )
 
@@ -66,7 +66,7 @@ fun TaskCard(
                 Text(
                     text = task.title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (task.isCompleted) SecondaryText else PrimaryText,
+                    color = if (task.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onBackground,
                     textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -76,7 +76,7 @@ fun TaskCard(
                     Text(
                         text = task.description,
                         style = MaterialTheme.typography.bodySmall,
-                        color = SecondaryText,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

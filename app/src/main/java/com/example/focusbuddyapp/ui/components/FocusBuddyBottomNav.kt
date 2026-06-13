@@ -23,7 +23,7 @@ fun FocusBuddyBottomNav(
     currentRoute: String?
 ) {
     NavigationBar(
-        containerColor = SurfaceWhite,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp
     ) {
         bottomNavItems.forEach { item ->
@@ -57,11 +57,11 @@ fun FocusBuddyBottomNav(
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PrimaryNavy,
-                    selectedTextColor = DarkTerracotta,
-                    indicatorColor = PrimaryNavy.copy(alpha = 0.12f),
-                    unselectedIconColor = SecondaryText,
-                    unselectedTextColor = SecondaryText
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.secondary,
+                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             )
         }

@@ -39,7 +39,7 @@ fun TaskListScreen(
                 shape = CircleShape
             ) { Icon(Icons.Filled.Add, "Add Task") }
         },
-        containerColor = WarmBackground
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -52,7 +52,7 @@ fun TaskListScreen(
             // Header
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    Modifier.size(44.dp).clip(CircleShape).background(SurfaceDim),
+                    Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     if (uiState.profilePhotoUri != null) {
@@ -69,9 +69,9 @@ fun TaskListScreen(
                     }
                 }
                 Spacer(Modifier.width(12.dp))
-                Text("Hello, ${uiState.userName.ifBlank { "Scholar" }}", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
+                Text("Hello, ${uiState.userName.ifBlank { "Scholar" }}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.weight(1f))
-                Icon(Icons.Filled.Settings, null, tint = SecondaryText)
+                Icon(Icons.Filled.Settings, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             Spacer(Modifier.height(16.dp))
@@ -81,15 +81,15 @@ fun TaskListScreen(
                 value = uiState.searchQuery,
                 onValueChange = viewModel::onSearchChange,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Search tasks...", color = SecondaryText) },
-                leadingIcon = { Icon(Icons.Filled.Search, null, tint = SecondaryText) },
+                placeholder = { Text("Search tasks...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                leadingIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
                 singleLine = true,
                 shape = RoundedCornerShape(50),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = PrimaryNavy,
                     unfocusedBorderColor = OutlineVariant,
-                    focusedContainerColor = SurfaceWhite,
-                    unfocusedContainerColor = SurfaceWhite
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
 
@@ -106,8 +106,8 @@ fun TaskListScreen(
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryNavy,
                             selectedLabelColor = Color.White,
-                            containerColor = SurfaceContainer,
-                            labelColor = SecondaryText
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -117,11 +117,11 @@ fun TaskListScreen(
 
             // Queue header
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Task Queue", style = MaterialTheme.typography.titleMedium, color = PrimaryText)
+                Text("Task Queue", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
                 Text(
                     "${uiState.filteredTasks.size} Tasks remaining",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = SecondaryText
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -135,10 +135,10 @@ fun TaskListScreen(
             } else if (uiState.filteredTasks.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.Assignment, null, tint = SecondaryText, modifier = Modifier.size(48.dp))
+                        Icon(Icons.Filled.Assignment, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(48.dp))
                         Spacer(Modifier.height(12.dp))
-                        Text("No tasks found", style = MaterialTheme.typography.bodyLarge, color = SecondaryText)
-                        Text("Tap + to add your first task", style = MaterialTheme.typography.bodyMedium, color = SecondaryText)
+                        Text("No tasks found", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Tap + to add your first task", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             } else {

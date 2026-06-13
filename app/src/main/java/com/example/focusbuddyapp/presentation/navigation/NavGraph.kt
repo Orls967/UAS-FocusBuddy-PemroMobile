@@ -116,6 +116,7 @@ fun NavGraph() {
                     onNavigateToAddTask = { navController.navigate(Screen.AddEditTask.createRoute()) },
                     onNavigateToTask = { taskId -> navController.navigate(Screen.TaskDetail.createRoute(taskId)) },
                     onNavigateToTimer = { navController.navigate(Screen.FocusTimer.route) },
+                    onNavigateToTaskList = { navController.navigate(Screen.TaskList.route) },
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(Screen.Dashboard.route) { inclusive = true }

@@ -71,6 +71,10 @@ class AddEditTaskViewModel(private val taskId: Int?) : ViewModel() {
         val state = _uiState.value
         try {
             val currentUserId = AppModule.userPreferences.userId.first()
+            if (currentUserId <= 0) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Sesi tidak valid. Silakan login ulang.") }
+                return@launch
+            }
             val task = Task(
                 id = taskId ?: 0,
                 userId = currentUserId,
