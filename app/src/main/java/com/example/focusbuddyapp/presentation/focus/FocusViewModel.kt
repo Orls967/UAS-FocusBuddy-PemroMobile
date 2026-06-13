@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -52,6 +53,11 @@ class FocusViewModel : ViewModel() {
             }
         }
         viewModelScope.launch {
+            AppModule.userPreferences.activeTaskTitle.collect { title ->
+                _uiState.update { it.copy(currentTaskTitle = title.ifBlank { "No Active Task" }) }
+            }
+        }
+        viewModelScope.launch {
             AppModule.userPreferences.profilePhotoUri.collect { uri ->
                 _uiState.update { it.copy(profilePhotoUri = uri) }
             }
@@ -78,10 +84,12 @@ class FocusViewModel : ViewModel() {
 
     fun startTimer() = viewModelScope.launch {
         if (_uiState.value.timerState == TimerState.IDLE) {
+            val activeTaskId = AppModule.userPreferences.activeTaskId.first()
             // Create a new session record
             val session = FocusSession(
                 durationMinutes = _uiState.value.totalSeconds / 60,
-                breakDurationMinutes = _uiState.value.breakDurationMinutes
+                breakDurationMinutes = _uiState.value.breakDurationMinutes,
+                linkedTaskId = if (activeTaskId != 0) activeTaskId else null
             )
             val sessionId = startSessionUseCase(session)
             _uiState.update { it.copy(activeSessionId = sessionId.toInt()) }

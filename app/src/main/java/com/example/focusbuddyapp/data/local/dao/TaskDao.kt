@@ -27,7 +27,7 @@ interface TaskDao {
     suspend fun deleteTask(id: Int)
 
     // ── Extras ───────────────────────────────────────────────────────────────
-    @Query("UPDATE tasks SET is_completed = :isCompleted WHERE id = :id")
+    @Query("UPDATE tasks SET is_completed = :isCompleted, progress_percent = CASE WHEN :isCompleted = 1 THEN 100 ELSE 0 END WHERE id = :id")
     suspend fun toggleTaskComplete(id: Int, isCompleted: Boolean)
 
     @Query("SELECT * FROM tasks WHERE title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' ORDER BY due_date ASC")

@@ -22,6 +22,8 @@ class UserPreferences(private val context: Context) {
         val BREAK_MIN      = intPreferencesKey("break_minutes")
         val NOTIF_ENABLED  = booleanPreferencesKey("notifications_enabled")
         val PROFILE_PHOTO_URI = stringPreferencesKey("profile_photo_uri")
+        val ACTIVE_TASK_ID = intPreferencesKey("active_task_id")
+        val ACTIVE_TASK_TITLE = stringPreferencesKey("active_task_title")
     }
 
     // Auth token
@@ -38,6 +40,8 @@ class UserPreferences(private val context: Context) {
     val breakMinutes: Flow<Int> = context.dataStore.data.map { it[BREAK_MIN] ?: 5 }
     val notificationsEnabled: Flow<Boolean> = context.dataStore.data.map { it[NOTIF_ENABLED] ?: true }
     val profilePhotoUri: Flow<String?> = context.dataStore.data.map { it[PROFILE_PHOTO_URI] }
+    val activeTaskId: Flow<Int> = context.dataStore.data.map { it[ACTIVE_TASK_ID] ?: 0 }
+    val activeTaskTitle: Flow<String> = context.dataStore.data.map { it[ACTIVE_TASK_TITLE] ?: "" }
 
     suspend fun saveAuthToken(token: String) {
         context.dataStore.edit { it[AUTH_TOKEN] = token }
@@ -69,6 +73,20 @@ class UserPreferences(private val context: Context) {
             } else {
                 it.remove(PROFILE_PHOTO_URI)
             }
+        }
+    }
+
+    suspend fun saveActiveTask(id: Int, title: String) {
+        context.dataStore.edit {
+            it[ACTIVE_TASK_ID] = id
+            it[ACTIVE_TASK_TITLE] = title
+        }
+    }
+
+    suspend fun clearActiveTask() {
+        context.dataStore.edit {
+            it.remove(ACTIVE_TASK_ID)
+            it.remove(ACTIVE_TASK_TITLE)
         }
     }
 

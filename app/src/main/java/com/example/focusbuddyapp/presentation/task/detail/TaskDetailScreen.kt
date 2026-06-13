@@ -121,7 +121,10 @@ fun TaskDetailScreen(
                     Text("Project Momentum", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(0.7f))
                     Spacer(Modifier.height(8.dp))
                     OutlinedButton(
-                        onClick = onNavigateToTimer,
+                        onClick = {
+                            viewModel.startTimerForTask()
+                            onNavigateToTimer()
+                        },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
                         border = BorderStroke(1.dp, Color.White.copy(0.5f))
                     ) { Text("Start Timer", color = Color.White) }

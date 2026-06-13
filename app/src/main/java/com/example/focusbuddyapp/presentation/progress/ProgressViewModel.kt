@@ -28,22 +28,27 @@ class ProgressViewModel : ViewModel() {
     init { loadProgress() }
 
     private fun loadProgress() = viewModelScope.launch {
-        getWeeklyFocusUseCase().collect { weeklyData ->
+        combine(
+            getWeeklyFocusUseCase(),
+            AppModule.browseTasksUseCase()
+        ) { weeklyData, tasks ->
             val total = weeklyData.values.sum()
             val bestDay = weeklyData.maxByOrNull { it.value }?.key ?: "—"
             val daysWithFocus = weeklyData.values.count { it > 0 }
             val consistency = if (weeklyData.isNotEmpty()) (daysWithFocus * 100 / 7) else 0
+            val completedCount = tasks.count { it.isCompleted }
 
-            _uiState.update {
-                it.copy(
-                    weeklyData = weeklyData,
-                    totalFocusMinutes = total,
-                    bestDay = bestDay,
-                    consistencyPercent = consistency,
-                    deepWorkHours = total / 60f,
-                    isLoading = false
-                )
-            }
+            ProgressUiState(
+                weeklyData = weeklyData,
+                totalFocusMinutes = total,
+                bestDay = bestDay,
+                consistencyPercent = consistency,
+                deepWorkHours = total / 60f,
+                completedTaskCount = completedCount,
+                isLoading = false
+            )
+        }.collect { state ->
+            _uiState.value = state
         }
     }
 }

@@ -43,8 +43,15 @@ class TaskDetailViewModel(private val taskId: Int) : ViewModel() {
 
     fun toggleComplete() = viewModelScope.launch {
         val current = _uiState.value.task ?: return@launch
-        toggleTaskCompleteUseCase(taskId, !current.isCompleted)
-        _uiState.update { it.copy(task = current.copy(isCompleted = !current.isCompleted)) }
+        val newIsCompleted = !current.isCompleted
+        val newProgress = if (newIsCompleted) 100 else 0
+        toggleTaskCompleteUseCase(taskId, newIsCompleted)
+        _uiState.update { it.copy(task = current.copy(isCompleted = newIsCompleted, progressPercent = newProgress)) }
+    }
+
+    fun startTimerForTask() = viewModelScope.launch {
+        val current = _uiState.value.task ?: return@launch
+        AppModule.userPreferences.saveActiveTask(current.id, current.title)
     }
 }
 

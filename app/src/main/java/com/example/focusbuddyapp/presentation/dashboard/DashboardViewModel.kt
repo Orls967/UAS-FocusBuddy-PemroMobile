@@ -8,6 +8,7 @@ import com.example.focusbuddyapp.domain.model.Quote
 import com.example.focusbuddyapp.domain.model.Task
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 data class DashboardUiState(
     val userName: String = "",
@@ -26,6 +27,7 @@ data class DashboardUiState(
 class DashboardViewModel : ViewModel() {
     private val browseTasksUseCase = AppModule.browseTasksUseCase
     private val getTodayFocusSummaryUseCase = AppModule.getTodayFocusSummaryUseCase
+    private val getWeeklyFocusDataUseCase = AppModule.getWeeklyFocusDataUseCase
     private val logoutUseCase = AppModule.logoutUseCase
     private val quoteRepository = AppModule.quoteRepository
     private val userPreferences = AppModule.userPreferences
@@ -34,6 +36,41 @@ class DashboardViewModel : ViewModel() {
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
     init { loadDashboard() }
+
+    private fun getTodayBounds(): Pair<Long, Long> {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        val start = cal.timeInMillis
+        val end = start + 24 * 60 * 60 * 1000L
+        return Pair(start, end)
+    }
+
+    private fun getWeekBounds(): Pair<Long, Long> {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        
+        val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
+        val offset = when (dayOfWeek) {
+            Calendar.SUNDAY -> -6
+            Calendar.MONDAY -> 0
+            Calendar.TUESDAY -> -1
+            Calendar.WEDNESDAY -> -2
+            Calendar.THURSDAY -> -3
+            Calendar.FRIDAY -> -4
+            Calendar.SATURDAY -> -5
+            else -> 0
+        }
+        cal.add(Calendar.DAY_OF_MONTH, offset)
+        val start = cal.timeInMillis
+        val end = start + 7 * 24 * 60 * 60 * 1000L
+        return Pair(start, end)
+    }
 
     private fun loadDashboard() = viewModelScope.launch {
         // User name
@@ -48,12 +85,40 @@ class DashboardViewModel : ViewModel() {
         }
         viewModelScope.launch {
             browseTasksUseCase().collect { tasks ->
-                _uiState.update { it.copy(todayTasks = tasks.take(4), isLoading = false) }
+                val (startOfToday, endOfToday) = getTodayBounds()
+                val (startOfWeek, endOfWeek) = getWeekBounds()
+
+                val completedToday = tasks.count {
+                    it.isCompleted && it.dueDate != null && it.dueDate >= startOfToday && it.dueDate < endOfToday
+                }
+                val completedThisWeek = tasks.count {
+                    it.isCompleted && it.dueDate != null && it.dueDate >= startOfWeek && it.dueDate < endOfWeek
+                }
+
+                // Filter tasks that are due today
+                val todayTasks = tasks.filter { task ->
+                    task.dueDate != null && task.dueDate >= startOfToday && task.dueDate < endOfToday
+                }.take(4)
+
+                _uiState.update {
+                    it.copy(
+                        todayTasks = todayTasks,
+                        completedTodayCount = completedToday,
+                        totalThisWeekCount = completedThisWeek,
+                        isLoading = false
+                    )
+                }
             }
         }
         viewModelScope.launch {
             getTodayFocusSummaryUseCase().collect { minutes ->
                 _uiState.update { it.copy(todayFocusMinutes = minutes) }
+            }
+        }
+        viewModelScope.launch {
+            getWeeklyFocusDataUseCase().collect { weeklyData ->
+                val totalMinutes = weeklyData.values.sum()
+                _uiState.update { it.copy(weeklyFocusMinutes = totalMinutes) }
             }
         }
         viewModelScope.launch {

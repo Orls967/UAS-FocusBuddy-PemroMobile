@@ -145,7 +145,7 @@ public final class TaskDao_Impl implements TaskDao {
       @Override
       @NonNull
       public String createQuery() {
-        final String _query = "UPDATE tasks SET is_completed = ? WHERE id = ?";
+        final String _query = "UPDATE tasks SET is_completed = ?, progress_percent = CASE WHEN ? = 1 THEN 100 ELSE 0 END WHERE id = ?";
         return _query;
       }
     };
@@ -232,6 +232,9 @@ public final class TaskDao_Impl implements TaskDao {
         final int _tmp = isCompleted ? 1 : 0;
         _stmt.bindLong(_argIndex, _tmp);
         _argIndex = 2;
+        final int _tmp_1 = isCompleted ? 1 : 0;
+        _stmt.bindLong(_argIndex, _tmp_1);
+        _argIndex = 3;
         _stmt.bindLong(_argIndex, id);
         try {
           __db.beginTransaction();
