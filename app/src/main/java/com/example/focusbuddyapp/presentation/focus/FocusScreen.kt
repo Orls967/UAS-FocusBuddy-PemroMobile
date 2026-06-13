@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.focusbuddyapp.ui.components.CircularTimer
 import com.example.focusbuddyapp.ui.theme.*
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun FocusScreen(viewModel: FocusViewModel) {
@@ -34,12 +37,24 @@ fun FocusScreen(viewModel: FocusViewModel) {
 
             // App bar
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.ArrowBack, null, tint = PrimaryNavy)
-                Spacer(Modifier.weight(1f))
                 Text("Focus Session", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
                 Spacer(Modifier.weight(1f))
-                Box(Modifier.size(36.dp).background(SurfaceDim, CircleShape), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.Person, null, tint = PrimaryNavy, modifier = Modifier.size(20.dp))
+                Box(
+                    Modifier.size(36.dp).clip(CircleShape).background(SurfaceDim),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (uiState.profilePhotoUri != null) {
+                        AsyncImage(
+                            model = uiState.profilePhotoUri,
+                            contentDescription = "Profile Photo",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(Icons.Filled.Person, null, tint = PrimaryNavy, modifier = Modifier.size(20.dp))
+                    }
                 }
             }
 

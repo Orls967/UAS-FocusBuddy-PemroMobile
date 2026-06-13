@@ -14,7 +14,8 @@ data class ProfileUiState(
     val breakMinutes: Int = 5,
     val notificationsEnabled: Boolean = true,
     val totalFocusMinutes: Int = 0,
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    val profilePhotoUri: String? = null
 )
 
 class ProfileViewModel : ViewModel() {
@@ -29,7 +30,7 @@ class ProfileViewModel : ViewModel() {
     init { loadProfile() }
 
     private fun loadProfile() = viewModelScope.launch {
-        combine(
+        val baseFlow = combine(
             authRepository.getCurrentUser(),
             userPreferences.pomodoroMinutes,
             userPreferences.breakMinutes,
@@ -44,6 +45,10 @@ class ProfileViewModel : ViewModel() {
                 totalFocusMinutes = focusMin,
                 isLoading = false
             )
+        }
+
+        combine(baseFlow, userPreferences.profilePhotoUri) { state, photoUri ->
+            state.copy(profilePhotoUri = photoUri)
         }.collect { _uiState.value = it }
     }
 
@@ -60,6 +65,10 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun logout() = viewModelScope.launch { logoutUseCase() }
+
+    fun setProfilePhoto(uri: String?) = viewModelScope.launch {
+        userPreferences.saveProfilePhotoUri(uri)
+    }
 }
 
 class ProfileViewModelFactory : ViewModelProvider.Factory {

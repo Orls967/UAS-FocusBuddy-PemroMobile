@@ -35,8 +35,6 @@ fun ProgressScreen(viewModel: ProgressViewModel) {
 
             // Header
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.ArrowBack, null, tint = PrimaryNavy)
-                Spacer(Modifier.width(12.dp))
                 Text("My Progress", style = MaterialTheme.typography.headlineMedium, color = PrimaryText, modifier = Modifier.weight(1f))
                 Icon(Icons.Filled.Settings, null, tint = SecondaryText)
             }
@@ -106,7 +104,7 @@ fun ProgressScreen(viewModel: ProgressViewModel) {
                     Icon(Icons.Filled.Lightbulb, null, tint = PrimaryNavy, modifier = Modifier.size(32.dp))
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "You've Spent ${(uiState.totalFocusMinutes / 60f).toInt()} Days, Working on a Task at ${uiState.bestDay}!",
+                        "You've Spent ${(uiState.totalFocusMinutes / 60f).toInt()} Hours, Working on a Task at ${uiState.bestDay}!",
                         style = MaterialTheme.typography.titleMedium,
                         color = PrimaryText,
                         fontWeight = FontWeight.Bold

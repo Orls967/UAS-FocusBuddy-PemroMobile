@@ -20,10 +20,11 @@ data class FocusUiState(
     val remainingSeconds: Int = 30 * 60,
     val timerState: TimerState = TimerState.IDLE,
     val breakDurationMinutes: Int = 5,
-    val currentTaskTitle: String = "UTS Mobile",
+    val currentTaskTitle: String = "No Active Task",
     val todayFocusMinutes: Int = 0,
     val efficiencyPercent: Int = 85,
-    val activeSessionId: Int? = null
+    val activeSessionId: Int? = null,
+    val profilePhotoUri: String? = null
 ) {
     val progress: Float get() = 1f - (remainingSeconds.toFloat() / totalSeconds)
     val timerText: String get() {
@@ -48,6 +49,29 @@ class FocusViewModel : ViewModel() {
         viewModelScope.launch {
             getTodaySummaryUseCase().collect { minutes ->
                 _uiState.update { it.copy(todayFocusMinutes = minutes) }
+            }
+        }
+        viewModelScope.launch {
+            AppModule.userPreferences.profilePhotoUri.collect { uri ->
+                _uiState.update { it.copy(profilePhotoUri = uri) }
+            }
+        }
+        viewModelScope.launch {
+            AppModule.userPreferences.pomodoroMinutes.collect { minutes ->
+                if (_uiState.value.timerState == TimerState.IDLE) {
+                    val totalSecs = minutes * 60
+                    _uiState.update {
+                        it.copy(
+                            totalSeconds = totalSecs,
+                            remainingSeconds = totalSecs
+                        )
+                    }
+                }
+            }
+        }
+        viewModelScope.launch {
+            AppModule.userPreferences.breakMinutes.collect { minutes ->
+                _uiState.update { it.copy(breakDurationMinutes = minutes) }
             }
         }
     }

@@ -20,6 +20,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.focusbuddyapp.domain.model.Task
 import com.example.focusbuddyapp.ui.components.PriorityChip
 import com.example.focusbuddyapp.ui.theme.*
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun DashboardScreen(
@@ -57,10 +59,23 @@ fun DashboardScreen(
                 Box(
                     Modifier.size(44.dp).clip(CircleShape).background(SurfaceDim),
                     contentAlignment = Alignment.Center
-                ) { Icon(Icons.Filled.Person, null, tint = PrimaryNavy) }
+                ) {
+                    if (uiState.profilePhotoUri != null) {
+                        AsyncImage(
+                            model = uiState.profilePhotoUri,
+                            contentDescription = "Profile Photo",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(Icons.Filled.Person, null, tint = PrimaryNavy)
+                    }
+                }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Hello, Scholar", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
+                    Text("Hello, ${uiState.userName.ifBlank { "Scholar" }}", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
                 }
                 IconButton(onClick = {}) {
                     Icon(Icons.Filled.Settings, null, tint = SecondaryText)
@@ -176,15 +191,6 @@ fun DashboardScreen(
                     Spacer(Modifier.height(8.dp))
                 }
             }
-
-            // Logout
-            Spacer(Modifier.height(16.dp))
-            Button(
-                onClick = { viewModel.logout(); onLogout() },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryTerracotta)
-            ) { Text("Log Out", color = Color.White) }
 
             Spacer(Modifier.height(16.dp))
         }

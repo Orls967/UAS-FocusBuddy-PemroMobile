@@ -9,6 +9,7 @@ import com.example.focusbuddyapp.domain.model.Task
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -68,20 +69,26 @@ class AddEditTaskViewModel(private val taskId: Int?) : ViewModel() {
     fun save() = viewModelScope.launch {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         val state = _uiState.value
-        val task = Task(
-            id = taskId ?: 0,
-            title = state.title,
-            description = state.description,
-            category = state.category,
-            priority = state.priority,
-            dueDate = state.dueDate,
-            studyNotes = state.studyNotes
-        )
-        val result = if (state.isEditMode) editTaskUseCase(task) else addTaskUseCase(task).map { Unit }
-        result.fold(
-            onSuccess = { _uiState.update { it.copy(isLoading = false, isSaved = true) } },
-            onFailure = { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }
-        )
+        try {
+            val currentUserId = AppModule.userPreferences.userId.first()
+            val task = Task(
+                id = taskId ?: 0,
+                userId = currentUserId,
+                title = state.title,
+                description = state.description,
+                category = state.category,
+                priority = state.priority,
+                dueDate = state.dueDate,
+                studyNotes = state.studyNotes
+            )
+            val result = if (state.isEditMode) editTaskUseCase(task) else addTaskUseCase(task).map { Unit }
+            result.fold(
+                onSuccess = { _uiState.update { it.copy(isLoading = false, isSaved = true) } },
+                onFailure = { e -> _uiState.update { it.copy(isLoading = false, errorMessage = e.message) } }
+            )
+        } catch (e: Exception) {
+            _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+        }
     }
 }
 

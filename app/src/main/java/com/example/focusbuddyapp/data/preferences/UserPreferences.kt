@@ -21,6 +21,7 @@ class UserPreferences(private val context: Context) {
         val POMODORO_MIN   = intPreferencesKey("pomodoro_minutes")
         val BREAK_MIN      = intPreferencesKey("break_minutes")
         val NOTIF_ENABLED  = booleanPreferencesKey("notifications_enabled")
+        val PROFILE_PHOTO_URI = stringPreferencesKey("profile_photo_uri")
     }
 
     // Auth token
@@ -36,6 +37,7 @@ class UserPreferences(private val context: Context) {
     val pomodoroMinutes: Flow<Int> = context.dataStore.data.map { it[POMODORO_MIN] ?: 25 }
     val breakMinutes: Flow<Int> = context.dataStore.data.map { it[BREAK_MIN] ?: 5 }
     val notificationsEnabled: Flow<Boolean> = context.dataStore.data.map { it[NOTIF_ENABLED] ?: true }
+    val profilePhotoUri: Flow<String?> = context.dataStore.data.map { it[PROFILE_PHOTO_URI] }
 
     suspend fun saveAuthToken(token: String) {
         context.dataStore.edit { it[AUTH_TOKEN] = token }
@@ -58,6 +60,16 @@ class UserPreferences(private val context: Context) {
 
     suspend fun saveNotificationEnabled(enabled: Boolean) {
         context.dataStore.edit { it[NOTIF_ENABLED] = enabled }
+    }
+
+    suspend fun saveProfilePhotoUri(uri: String?) {
+        context.dataStore.edit {
+            if (uri != null) {
+                it[PROFILE_PHOTO_URI] = uri
+            } else {
+                it.remove(PROFILE_PHOTO_URI)
+            }
+        }
     }
 
     suspend fun clearAll() {

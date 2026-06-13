@@ -16,10 +16,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.focusbuddyapp.ui.theme.*
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                try {
+                    val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    context.contentResolver.takePersistableUriPermission(uri, flag)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                viewModel.setProfilePhoto(uri.toString())
+            }
+        }
+    )
 
     Scaffold(containerColor = WarmBackground) { paddingValues ->
         Column(
@@ -39,8 +61,47 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
             // Avatar + name card
             Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(SurfaceWhite), elevation = CardDefaults.cardElevation(2.dp)) {
                 Row(Modifier.padding(20.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(72.dp).clip(CircleShape).background(SurfaceDim), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Filled.Person, null, tint = PrimaryNavy, modifier = Modifier.size(40.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(CircleShape)
+                            .background(SurfaceDim)
+                            .clickable {
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (uiState.profilePhotoUri != null) {
+                            AsyncImage(
+                                model = uiState.profilePhotoUri,
+                                contentDescription = "Profile Photo",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Icon(Icons.Filled.Person, null, tint = PrimaryNavy, modifier = Modifier.size(40.dp))
+                        }
+
+                        // Small camera edit icon overlay at the bottom right of the avatar circle
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .size(22.dp)
+                                .background(PrimaryNavy, CircleShape)
+                                .border(1.5.dp, Color.White, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.CameraAlt,
+                                contentDescription = "Change Photo",
+                                tint = Color.White,
+                                modifier = Modifier.size(12.dp)
+                            )
+                        }
                     }
                     Spacer(Modifier.width(16.dp))
                     Column {

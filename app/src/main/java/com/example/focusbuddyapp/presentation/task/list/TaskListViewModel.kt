@@ -15,7 +15,9 @@ data class TaskListUiState(
     val searchQuery: String = "",
     val selectedFilter: String = "ALL",   // "ALL" | "HIGH" | "MEDIUM" | "LOW" | "DONE"
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val userName: String = "",
+    val profilePhotoUri: String? = null
 )
 
 class TaskListViewModel : ViewModel() {
@@ -37,8 +39,10 @@ class TaskListViewModel : ViewModel() {
         combine(
             browseTasksUseCase(),
             _searchQuery,
-            _selectedFilter
-        ) { tasks, query, filter ->
+            _selectedFilter,
+            AppModule.userPreferences.userName,
+            AppModule.userPreferences.profilePhotoUri
+        ) { tasks, query, filter, name, photoUri ->
             val filtered = tasks
                 .filter { task ->
                     val matchesQuery = query.isBlank() ||
@@ -58,7 +62,9 @@ class TaskListViewModel : ViewModel() {
                 filteredTasks = filtered,
                 searchQuery = query,
                 selectedFilter = filter,
-                isLoading = false
+                isLoading = false,
+                userName = name,
+                profilePhotoUri = photoUri
             )
         }.collect { state ->
             _uiState.value = state

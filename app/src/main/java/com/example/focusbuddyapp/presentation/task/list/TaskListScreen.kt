@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.focusbuddyapp.ui.components.TaskCard
 import com.example.focusbuddyapp.ui.theme.*
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun TaskListScreen(
@@ -48,11 +51,25 @@ fun TaskListScreen(
 
             // Header
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(44.dp).background(SurfaceDim, CircleShape), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.Person, null, tint = PrimaryNavy)
+                Box(
+                    Modifier.size(44.dp).clip(CircleShape).background(SurfaceDim),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (uiState.profilePhotoUri != null) {
+                        AsyncImage(
+                            model = uiState.profilePhotoUri,
+                            contentDescription = "Profile Photo",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(Icons.Filled.Person, null, tint = PrimaryNavy)
+                    }
                 }
                 Spacer(Modifier.width(12.dp))
-                Text("Hello, Scholar", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
+                Text("Hello, ${uiState.userName.ifBlank { "Scholar" }}", style = MaterialTheme.typography.titleLarge, color = PrimaryText)
                 Spacer(Modifier.weight(1f))
                 Icon(Icons.Filled.Settings, null, tint = SecondaryText)
             }

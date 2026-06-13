@@ -19,7 +19,8 @@ data class DashboardUiState(
     val todayTasks: List<Task> = emptyList(),
     val quote: Quote = Quote("Focus is the art of knowing what to ignore.", "Academic Momentum"),
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val profilePhotoUri: String? = null
 )
 
 class DashboardViewModel : ViewModel() {
@@ -40,6 +41,11 @@ class DashboardViewModel : ViewModel() {
             _uiState.update { it.copy(userName = name) }
         }
     }.also {
+        viewModelScope.launch {
+            userPreferences.profilePhotoUri.collect { uri ->
+                _uiState.update { it.copy(profilePhotoUri = uri) }
+            }
+        }
         viewModelScope.launch {
             browseTasksUseCase().collect { tasks ->
                 _uiState.update { it.copy(todayTasks = tasks.take(4), isLoading = false) }
