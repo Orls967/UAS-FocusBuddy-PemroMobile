@@ -52,6 +52,9 @@ fun NavGraph() {
     val isFocusLocked by AppModule.userPreferences.isFocusLocked.collectAsState(initial = false)
 
     val showBottomNav = currentRoute in bottomNavRoutes
+    
+    // Hoist FocusViewModel to Activity scope so timer survives navigation
+    val focusViewModel: FocusViewModel = viewModel(factory = FocusViewModelFactory())
 
     Scaffold(
         bottomBar = {
@@ -142,9 +145,8 @@ fun NavGraph() {
             }
 
             composable(Screen.FocusTimer.route) {
-                val vm: FocusViewModel = viewModel(factory = FocusViewModelFactory())
                 FocusScreen(
-                    viewModel = vm,
+                    viewModel = focusViewModel,
                     onNavigateToTaskList = { navController.navigate(Screen.TaskList.route) }
                 )
             }

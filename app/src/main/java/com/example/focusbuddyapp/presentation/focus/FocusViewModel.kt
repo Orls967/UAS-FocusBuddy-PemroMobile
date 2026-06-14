@@ -149,14 +149,40 @@ class FocusViewModel : ViewModel() {
     }
 
     fun completeTask() = viewModelScope.launch {
+        timerJob?.cancel()
         val activeTaskId = AppModule.userPreferences.activeTaskId.first()
         if (activeTaskId != 0) {
             AppModule.toggleTaskCompleteUseCase(activeTaskId, true)
             AppModule.userPreferences.clearActiveTask()
         }
-        stopSessionAndReset(showDialogAfter = false)
+        
+        val state = _uiState.value
+        state.activeSessionId?.let { id ->
+            val durationSpent = state.totalSeconds - state.remainingSeconds
+            val session = FocusSession(
+                id = id,
+                durationMinutes = durationSpent / 60,
+                startTime = System.currentTimeMillis() - durationSpent * 1000L
+            )
+            stopSessionUseCase(session)
+        }
+        
         AppModule.userPreferences.saveFocusLocked(false)
         dismissCompleteTaskDialog()
+        
+        val breakMin = AppModule.userPreferences.breakMinutes.first()
+        val totalSecs = breakMin * 60
+        _uiState.update {
+            it.copy(
+                isBreakMode = true,
+                showBreakDialog = false,
+                totalSeconds = totalSecs,
+                remainingSeconds = totalSecs,
+                timerState = TimerState.RUNNING,
+                activeSessionId = null
+            )
+        }
+        runTimer()
     }
 
     fun showCompleteTaskDialog() {
