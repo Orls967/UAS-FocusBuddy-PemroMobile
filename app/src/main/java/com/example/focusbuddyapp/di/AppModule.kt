@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit
  */
 object AppModule {
     private const val BASE_URL = "https://api.focusbuddy.app/v1/"
-    private const val QUOTE_URL = "https://api.quotable.io/"
+    private const val QUOTE_URL = "https://dummyjson.com/"
 
     lateinit var appContext: Context
 

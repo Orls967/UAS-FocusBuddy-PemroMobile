@@ -5,8 +5,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface QuoteApiService {
-    @GET("random")
-    suspend fun getRandomQuote(
-        @Query("tags") tags: String = "inspirational,study"
-    ): QuoteDto
+    @GET("quotes/random")
+    suspend fun getRandomQuote(): QuoteDto
 }

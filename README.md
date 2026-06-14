@@ -225,14 +225,14 @@ Contoh domain model:
 - `SubTask.kt`
 - `Quote.kt`
 
-Contoh repository interface:
+Repository interface:
 
 - `TaskRepository.kt`
 - `AuthRepository.kt`
 - `FocusSessionRepository.kt`
 - `QuoteRepository.kt`
 
-Contoh use case:
+Use case:
 
 - `BrowseTasksUseCase`
 - `ReadTaskUseCase`
@@ -273,7 +273,7 @@ data
 
 Data Layer bertanggung jawab mengambil data dari Room/API, menyimpan data, dan mengubah data dari entity/DTO ke domain model.
 
-## 📂 Struktur Folder Project
+## Struktur Folder Project
 
 Struktur folder utama:
 
@@ -337,7 +337,7 @@ Penjelasan folder:
 - `ui/theme`: warna, typography, shape, dan theme aplikasi.
 - `di`: dependency provider melalui `AppModule`.
 
-## 🌐 API yang Digunakan
+## API yang Digunakan
 
 Project menyediakan konfigurasi Retrofit dan tiga API service: AuthApiService, TaskApiService, dan QuoteApiService. Pada implementasi saat ini, API service terutama berperan sebagai struktur remote layer. Fitur utama aplikasi tetap berjalan secara offline-first menggunakan Room Database dan DataStore.
 
@@ -409,7 +409,7 @@ GET random?tags=inspirational,study
 
 QuoteApiService tersedia untuk integrasi Quotable API, tetapi pada implementasi saat ini belum dipanggil oleh QuoteRepositoryImpl. Quote yang tampil di aplikasi diambil dari daftar quote lokal secara random.
 
-## 🗄 Database Lokal
+## Database Lokal
 
 FocusBuddy menggunakan **Room Database** sebagai database lokal utama.
 
@@ -509,7 +509,7 @@ Field utama:
 - `remote_id`
 - `synced_at`
 
-## 💾 DataStore Preferences
+## DataStore Preferences
 
 FocusBuddy menggunakan **DataStore Preferences** untuk menyimpan data kecil yang berkaitan dengan session dan preferensi pengguna.
 
@@ -535,7 +535,7 @@ Data yang disimpan:
 - Demo data seeded flag
 - Focus lock state
 
-## 🔁 BREAD Task
+## BREAD Task
 
 FocusBuddy memenuhi fitur BREAD pada Task Management:
 
@@ -553,7 +553,7 @@ data/repository/TaskRepositoryImpl.kt
 data/local/dao/TaskDao.kt
 ```
 
-## 📡 Offline-First Strategy
+## Offline-First Strategy
 
 FocusBuddy menerapkan pendekatan offline-first:
 
@@ -565,7 +565,7 @@ FocusBuddy menerapkan pendekatan offline-first:
 
 Pendekatan ini membuat aplikasi tetap stabil untuk demo UAS dan tetap dapat digunakan walaupun koneksi internet tidak tersedia.
 
-## 🧪 State Management
+## State Management
 
 State management menggunakan:
 
@@ -589,7 +589,7 @@ Contoh state yang dikelola:
 - Profile photo
 - Weekly analytics data
 
-## 🔔 Notification
+## Notification
 
 FocusBuddy memiliki notification helper untuk menampilkan notifikasi ketika sesi fokus selesai.
 
@@ -601,7 +601,7 @@ ui/util/NotificationHelper.kt
 
 Notifikasi digunakan agar pengguna mengetahui bahwa sesi fokus telah selesai dan dapat melanjutkan ke break atau task berikutnya.
 
-## ✅ Kesesuaian Dengan Kebutuhan UAS
+## Kesesuaian Dengan Kebutuhan UAS
 
 Project ini memenuhi poin utama dokumentasi dan implementasi UAS:
 
@@ -621,7 +621,7 @@ Project ini memenuhi poin utama dokumentasi dan implementasi UAS:
 - Memiliki progress analytics.
 - Memiliki fitur tambahan seperti dark mode, profile photo, focus lock, dan demo data.
 
-## 📌 Catatan Pengembangan
+## Catatan Pengembangan
 
 Beberapa catatan teknis project:
 
@@ -630,7 +630,7 @@ Beberapa catatan teknis project:
 - API service sudah tersedia, tetapi fitur utama tetap berjalan secara offline-first menggunakan database lokal.
 - Auth demo berjalan menggunakan user lokal di Room dan session di DataStore.
 
-## 🔮 Rencana Pengembangan
+## Rencana Pengembangan
 
 Pengembangan lanjutan yang dapat dilakukan:
 
@@ -644,11 +644,11 @@ Pengembangan lanjutan yang dapat dilakukan:
 - Menambahkan export laporan progress belajar.
 - Menambahkan statistik lanjutan seperti streak, best focus hour, dan completion trend.
 
-## 👥 Anggota Kelompok
+## Anggota Kelompok
 
 - Muhammad Rizky Akbar - 2410817210016
 - Orlando Sugian - 2410817210017
 
-## 📄 Lisensi
+## Project FocusBuddy
 
 Project ini dibuat untuk kebutuhan akademik UAS Pemrograman Mobile.

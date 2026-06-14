@@ -11,6 +11,6 @@ data class FocusSessionDto(
 )
 
 data class QuoteDto(
-    val content: String,
-    val author: String
+    val quote: String,
+    val author: String?
 )

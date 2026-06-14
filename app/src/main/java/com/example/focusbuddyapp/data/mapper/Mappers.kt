@@ -89,4 +89,4 @@ fun SubTaskDto.toDomain() = SubTask(
     isCompleted = isCompleted, isUrgent = isUrgent
 )
 
-fun QuoteDto.toDomain() = Quote(content = content, author = author)
+fun QuoteDto.toDomain() = Quote(content = quote, author = author ?: "Unknown")

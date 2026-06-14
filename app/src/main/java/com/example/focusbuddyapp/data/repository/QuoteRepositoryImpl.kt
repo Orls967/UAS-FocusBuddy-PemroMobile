@@ -25,6 +25,10 @@ class QuoteRepositoryImpl(
     )
 
     override suspend fun getDailyQuote(): Quote = withContext(Dispatchers.IO) {
-        localQuotes.random()
+        try {
+            quoteApiService.getRandomQuote().toDomain()
+        } catch (e: Exception) {
+            localQuotes.random()
+        }
     }
 }
