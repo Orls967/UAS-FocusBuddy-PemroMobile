@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.School
 import com.example.focusbuddyapp.ui.theme.DarkNavy
 import com.example.focusbuddyapp.ui.theme.PrimaryNavy
 import com.example.focusbuddyapp.ui.theme.WarmBackground
@@ -73,11 +75,11 @@ fun SplashScreen(
                     .background(WarmBeige.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "FB",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = WarmBeige,
-                    fontWeight = FontWeight.ExtraBold
+                Icon(
+                    androidx.compose.material.icons.Icons.Filled.School,
+                    contentDescription = null,
+                    tint = WarmBeige,
+                    modifier = Modifier.size(48.dp)
                 )
             }
 

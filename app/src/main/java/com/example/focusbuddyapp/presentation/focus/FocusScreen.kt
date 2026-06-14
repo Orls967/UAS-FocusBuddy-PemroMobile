@@ -34,6 +34,7 @@ fun FocusScreen(
     if (uiState.showNextTaskModal) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissNextTaskModal() },
+            shape = RoundedCornerShape(16.dp),
             title = { Text("Pilih Tugas Berikutnya", style = MaterialTheme.typography.titleLarge) },
             text = {
                 if (uiState.activeTasks.isEmpty()) {
@@ -99,6 +100,7 @@ fun FocusScreen(
     if (uiState.showCompleteTaskDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissCompleteTaskDialog() },
+            shape = RoundedCornerShape(16.dp),
             title = { Text("Task Completed", style = MaterialTheme.typography.titleLarge) },
             text = { Text("Are you sure \"${uiState.currentTaskTitle}\" is finished?", style = MaterialTheme.typography.bodyMedium) },
             confirmButton = {
