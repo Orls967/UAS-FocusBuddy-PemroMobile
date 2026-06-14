@@ -1,2 +1,15 @@
+.idea/
+.kotlin/
+.vscode/
+
+.gradle/
+
+build/
 app/build/
+
+.DS_Store
+
+local.properties
+
+*.imlapp/build/
 .gradle/
