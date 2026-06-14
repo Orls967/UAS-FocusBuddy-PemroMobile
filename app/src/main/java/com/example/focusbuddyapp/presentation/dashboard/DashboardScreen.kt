@@ -107,11 +107,19 @@ fun DashboardScreen(
                     val focusMin = uiState.todayFocusMinutes % 60
                     val goalHours = uiState.dailyGoalMinutes / 60
                     val goalMin = uiState.dailyGoalMinutes % 60
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text("${focusHours}h", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground)
-                        Spacer(Modifier.width(4.dp))
-                        Text("${goalHours}h ${goalMin}m", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.secondary)
-                    }
+
+                    val focusText = if (focusHours > 0 && focusMin > 0) "${focusHours}h ${focusMin}m"
+                        else if (focusHours > 0) "${focusHours}h"
+                        else "${focusMin}m"
+                        
+                    val goalText = if (goalHours > 0 && goalMin > 0) "${goalHours}h ${goalMin}m"
+                        else if (goalHours > 0) "${goalHours}h"
+                        else "${goalMin}m"
+
+                    Text(focusText, style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground)
+                    Text("Today's Focus", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+                    Spacer(Modifier.height(4.dp))
+                    Text("Goal: $goalText", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.secondary)
                     Spacer(Modifier.height(8.dp))
                     LinearProgressIndicator(
                         progress = { focusProgress },

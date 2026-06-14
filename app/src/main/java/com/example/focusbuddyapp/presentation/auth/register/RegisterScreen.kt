@@ -105,11 +105,45 @@ fun RegisterScreen(
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { viewModel.register() }),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                     )
                 )
+
+                Spacer(Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().clickable(enabled = uiState.isPrivacyPolicyViewed) { 
+                        if (uiState.isPrivacyPolicyViewed) viewModel.onPrivacyPolicyAcceptChange(!uiState.isPrivacyPolicyAccepted) 
+                    },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = uiState.isPrivacyPolicyAccepted,
+                        onCheckedChange = viewModel::onPrivacyPolicyAcceptChange,
+                        enabled = uiState.isPrivacyPolicyViewed,
+                        colors = CheckboxDefaults.colors(checkedColor = PrimaryNavy)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("I agree to the ", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+                    Text(
+                        "Privacy Policy",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                        color = PrimaryNavy,
+                        modifier = Modifier.clickable { viewModel.showPrivacyPolicyDialog() }
+                    )
+                }
+
+                if (uiState.showPrivacyPolicyDialog) {
+                    com.example.focusbuddyapp.ui.components.PrivacyPolicyDialog(
+                        onDismissRequest = {
+                            viewModel.hidePrivacyPolicyDialog()
+                            viewModel.onPrivacyPolicyUnderstood()
+                        }
+                    )
+                }
 
                 if (uiState.errorMessage != null) {
                     Spacer(Modifier.height(8.dp))
@@ -121,7 +155,7 @@ fun RegisterScreen(
                 Button(
                     onClick = viewModel::register,
                     modifier = Modifier.fillMaxWidth().height(52.dp),
-                    enabled = !uiState.isLoading,
+                    enabled = !uiState.isLoading && uiState.isPrivacyPolicyViewed && uiState.isPrivacyPolicyAccepted,
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryNavy)
                 ) {

@@ -37,40 +37,7 @@ class DashboardViewModel : ViewModel() {
 
     init { 
         loadDashboard() 
-        viewModelScope.launch {
-            AppModule.taskRepository.getAllTasks().collect { tasks ->
-                android.util.Log.d("DEBUG_DATASET", "=== START DEBUG DATASET ===")
-                var totalFocusMinutes = 0
-                val (startOfToday, endOfToday) = getTodayBounds()
-                val (startOfWeek, endOfWeek) = getWeekBounds()
 
-                var todayFocusMinutes = 0
-                var currentWeekFocusMinutes = 0
-                var totalCompletedTasks = 0
-
-                tasks.forEach { task ->
-                    if (task.isCompleted) {
-                        android.util.Log.d("DEBUG_DATASET", "Task: ${task.title} | isCompleted: ${task.isCompleted} | focusDuration: ${task.focusDuration} | completedAt: ${task.completedAt}")
-                        totalCompletedTasks++
-                        totalFocusMinutes += task.focusDuration
-                        if (task.completedAt != null) {
-                            if (task.completedAt >= startOfToday && task.completedAt < endOfToday) {
-                                todayFocusMinutes += task.focusDuration
-                            }
-                            if (task.completedAt >= startOfWeek && task.completedAt < endOfWeek) {
-                                currentWeekFocusMinutes += task.focusDuration
-                            }
-                        }
-                    }
-                }
-                android.util.Log.d("DEBUG_DATASET", "TOTAL_COMPLETED_TASKS: $totalCompletedTasks")
-                android.util.Log.d("DEBUG_DATASET", "TOTAL_FOCUS_MINUTES: $totalFocusMinutes")
-                android.util.Log.d("DEBUG_DATASET", "TOTAL_FOCUS_HOURS: ${totalFocusMinutes / 60}")
-                android.util.Log.d("DEBUG_DATASET", "TODAY_FOCUS_MINUTES: $todayFocusMinutes")
-                android.util.Log.d("DEBUG_DATASET", "CURRENT_WEEK_FOCUS_MINUTES: $currentWeekFocusMinutes")
-                android.util.Log.d("DEBUG_DATASET", "=== END DEBUG DATASET ===")
-            }
-        }
     }
 
     private fun getTodayBounds(): Pair<Long, Long> {

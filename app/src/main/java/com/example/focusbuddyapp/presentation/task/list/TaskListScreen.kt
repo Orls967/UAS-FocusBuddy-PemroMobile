@@ -42,143 +42,143 @@ fun TaskListScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
         ) {
-            Spacer(Modifier.height(16.dp))
-
-            // Header
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (uiState.profilePhotoUri != null) {
-                        AsyncImage(
-                            model = uiState.profilePhotoUri,
-                            contentDescription = "Profile Photo",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Icon(Icons.Filled.Person, null, tint = PrimaryNavy)
+            item {
+                // Header
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (uiState.profilePhotoUri != null) {
+                            AsyncImage(
+                                model = uiState.profilePhotoUri,
+                                contentDescription = "Profile Photo",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Icon(Icons.Filled.Person, null, tint = PrimaryNavy)
+                        }
                     }
+                    Spacer(Modifier.width(12.dp))
+                    Text("Hello, ${uiState.userName.ifBlank { "Scholar" }}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
                 }
-                Spacer(Modifier.width(12.dp))
-                Text("Hello, ${uiState.userName.ifBlank { "Scholar" }}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
             }
 
-            Spacer(Modifier.height(16.dp))
-
-            // Search bar
-            OutlinedTextField(
-                value = uiState.searchQuery,
-                onValueChange = viewModel::onSearchChange,
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Search tasks...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                leadingIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
-                singleLine = true,
-                shape = RoundedCornerShape(50),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryNavy,
-                    unfocusedBorderColor = OutlineVariant,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            item {
+                Spacer(Modifier.height(6.dp))
+                // Search bar
+                OutlinedTextField(
+                    value = uiState.searchQuery,
+                    onValueChange = viewModel::onSearchChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("Search tasks...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    leadingIcon = { Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(50),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryNavy,
+                        unfocusedBorderColor = OutlineVariant,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    )
                 )
-            )
+            }
 
-            Spacer(Modifier.height(10.dp))
-
-            // Filter chips row
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                filters.forEach { filter ->
-                    val isSelected = uiState.selectedFilter == filter
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = { viewModel.onFilterChange(filter) },
-                        label = { Text(filter, style = MaterialTheme.typography.labelMedium) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = PrimaryNavy,
-                            selectedLabelColor = Color.White,
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+            item {
+                // Filter chips row
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    filters.forEach { filter ->
+                        val isSelected = uiState.selectedFilter == filter
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { viewModel.onFilterChange(filter) },
+                            label = { Text(filter, style = MaterialTheme.typography.labelMedium) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = PrimaryNavy,
+                                selectedLabelColor = Color.White,
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         )
+                    }
+                }
+            }
+
+            item {
+                // Queue header
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Task Queue", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+                    Text(
+                        "${uiState.activeTasks.size} Tasks remaining",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            Spacer(Modifier.height(10.dp))
-
-            // Queue header
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Task Queue", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
-                Text(
-                    "${uiState.activeTasks.size} Tasks remaining",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            // ─── LazyColumn (academic requirement) ──────────────────────────
+            // ─── Dynamic Content ──────────────────────────
             if (uiState.isLoading) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = PrimaryNavy)
+                item {
+                    Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = PrimaryNavy)
+                    }
                 }
             } else if (uiState.activeTasks.isEmpty() && uiState.completedTasks.isEmpty()) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.Assignment, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(48.dp))
-                        Spacer(Modifier.height(12.dp))
-                        Text("No tasks found", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Tap + to add your first task", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                item {
+                    Box(Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Filled.Assignment, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(48.dp))
+                            Spacer(Modifier.height(12.dp))
+                            Text("No tasks found", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("Tap + to add your first task", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                 }
             } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    contentPadding = PaddingValues(bottom = 80.dp)
-                ) {
-                    if (uiState.activeTasks.isNotEmpty()) {
-                        item {
-                            Text("Active Tasks", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-                        }
-                        items(
-                            items = uiState.activeTasks,
-                            key = { task -> "active_${task.id}" }
-                        ) { task ->
-                            TaskCard(
-                                task = task,
-                                onCheckedChange = {},
-                                onClick = { onNavigateToTask(task.id) },
-                                onStartFocus = { viewModel.startFocus(task, onNavigateToTimer) }
-                            )
-                        }
+                if (uiState.activeTasks.isNotEmpty()) {
+                    item {
+                        Text("Active Tasks", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
                     }
+                    items(
+                        items = uiState.activeTasks,
+                        key = { task -> "active_${task.id}" }
+                    ) { task ->
+                        TaskCard(
+                            task = task,
+                            onCheckedChange = {},
+                            onClick = { onNavigateToTask(task.id) },
+                            onStartFocus = { viewModel.startFocus(task, onNavigateToTimer) }
+                        )
+                    }
+                }
 
-                    if (uiState.completedTasks.isNotEmpty()) {
-                        item {
-                            Spacer(Modifier.height(12.dp))
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                            Spacer(Modifier.height(12.dp))
-                            Text("Completed Today", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-                        }
-                        items(
-                            items = uiState.completedTasks,
-                            key = { task -> "completed_${task.id}" }
-                        ) { task ->
-                            TaskCard(
-                                task = task,
-                                onCheckedChange = {},
-                                onClick = { onNavigateToTask(task.id) }
-                            )
-                        }
+                if (uiState.completedTasks.isNotEmpty()) {
+                    item {
+                        Spacer(Modifier.height(12.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        Spacer(Modifier.height(12.dp))
+                        Text("Completed Today", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    }
+                    items(
+                        items = uiState.completedTasks,
+                        key = { task -> "completed_${task.id}" }
+                    ) { task ->
+                        TaskCard(
+                            task = task,
+                            onCheckedChange = {},
+                            onClick = { onNavigateToTask(task.id) }
+                        )
                     }
                 }
             }

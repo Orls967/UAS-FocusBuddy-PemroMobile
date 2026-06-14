@@ -22,6 +22,8 @@ fun ProgressScreen(viewModel: ProgressViewModel, onNavigateToTaskList: () -> Uni
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     val maxMinutes = uiState.weeklyData.values.maxOrNull()?.takeIf { it > 0 } ?: 1
+    
+    var selectedDay by remember { mutableStateOf<String?>(null) }
 
     Scaffold(containerColor = MaterialTheme.colorScheme.background) { paddingValues ->
         Column(
@@ -54,15 +56,31 @@ fun ProgressScreen(viewModel: ProgressViewModel, onNavigateToTaskList: () -> Uni
                         verticalAlignment = Alignment.Bottom
                     ) {
                         days.forEach { day ->
-                            val minutes = uiState.weeklyData[day.uppercase()] ?: 0
+                            val dayKey = day.uppercase()
+                            val minutes = uiState.weeklyData[dayKey] ?: 0
                             val ratio = minutes.toFloat() / maxMinutes
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            val isSelected = selectedDay == dayKey
+                            
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .clickable { selectedDay = dayKey }
+                                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                            ) {
                                 Box(
                                     modifier = Modifier
                                         .width(28.dp)
                                         .height((100 * ratio + 4).dp)
                                         .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
-                                        .background(if (ratio > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                                        .background(
+                                            if (ratio > 0) {
+                                                MaterialTheme.colorScheme.primary.copy(
+                                                    alpha = if (selectedDay != null && !isSelected) 0.4f else 1f
+                                                )
+                                            } else {
+                                                MaterialTheme.colorScheme.surfaceVariant
+                                            }
+                                        )
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(day.take(3), style = MaterialTheme.typography.labelSmall, color = if (minutes > 0 && minutes == uiState.weeklyData.values.max()) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = if (minutes == uiState.weeklyData.values.maxOrNull()) FontWeight.Bold else FontWeight.Normal)
@@ -131,6 +149,82 @@ fun ProgressScreen(viewModel: ProgressViewModel, onNavigateToTaskList: () -> Uni
             }
 
             Spacer(Modifier.height(16.dp))
+        }
+        
+        if (selectedDay != null) {
+            val dayNameMap = mapOf(
+                "MON" to "Monday", "TUE" to "Tuesday", "WED" to "Wednesday",
+                "THU" to "Thursday", "FRI" to "Friday", "SAT" to "Saturday", "SUN" to "Sunday"
+            )
+            val fullDayName = dayNameMap[selectedDay] ?: selectedDay!!
+            val minutes = uiState.weeklyData[selectedDay] ?: 0
+            val tasks = uiState.tasksByDay[selectedDay] ?: emptyList()
+            val sessions = tasks.size
+
+            androidx.compose.ui.window.Dialog(onDismissRequest = { selectedDay = null }) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .padding(vertical = 24.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp)
+                    ) {
+                        Text(
+                            text = fullDayName, 
+                            style = MaterialTheme.typography.headlineSmall, 
+                            fontWeight = FontWeight.Bold, 
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        
+                        Text("Total Focus : ${minutes}m", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+                        Spacer(Modifier.height(4.dp))
+                        Text("Completed Tasks : ${tasks.size}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(4.dp))
+                        Text("Sessions : $sessions", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        
+                        Spacer(Modifier.height(16.dp))
+                        
+                        if (tasks.isNotEmpty()) {
+                            Text("Tasks:", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+                            Spacer(Modifier.height(8.dp))
+                            
+                            Box(modifier = Modifier.weight(1f, fill = false)) {
+                                androidx.compose.foundation.lazy.LazyColumn(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    items(tasks.size) { index ->
+                                        val task = tasks[index]
+                                        Text(
+                                            text = "• ${task.title} (${task.focusDuration}m)",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onBackground,
+                                            modifier = Modifier.padding(bottom = 6.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            Text("No tasks completed on this day.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        
+                        Spacer(Modifier.height(24.dp))
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(onClick = { selectedDay = null }) {
+                                Text("Close", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
