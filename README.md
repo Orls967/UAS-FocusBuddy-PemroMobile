@@ -407,7 +407,7 @@ Endpoint:
  @GET("quotes/random")
 ```
 
-QuoteApiService tersedia untuk integrasi Quotable API, tetapi pada implementasi saat ini belum dipanggil oleh QuoteRepositoryImpl. Quote yang tampil di aplikasi diambil dari daftar quote lokal secara random.
+QuoteApiService digunakan untuk mengambil quote motivasi dari API DummyJSON. Quote yang tampil di Dashboard berasal dari hasil fetching API secara real-time. Jika koneksi internet tidak tersedia, aplikasi akan menggunakan quote lokal sebagai fallback.
 
 ## Database Lokal
 
