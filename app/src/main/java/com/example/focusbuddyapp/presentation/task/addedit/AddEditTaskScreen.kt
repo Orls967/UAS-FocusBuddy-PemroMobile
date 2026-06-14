@@ -71,7 +71,7 @@ fun AddEditTaskScreen(
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
                         )
                     )
@@ -91,7 +91,7 @@ fun AddEditTaskScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary, unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
                             )
                         )
@@ -113,21 +113,24 @@ fun AddEditTaskScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Priority.values().forEach { priority ->
                             val selected = uiState.priority == priority
+                            val isDark = MaterialTheme.colorScheme.primary == DarkPrimary
+                            val selectedBg = when (priority) {
+                                Priority.HIGH   -> if (isDark) Color(0xFF4A1F1F) else PriorityHighBg
+                                Priority.MEDIUM -> if (isDark) Color(0xFF383530) else PriorityMedBg
+                                Priority.LOW    -> if (isDark) Color(0xFF1C2D42) else PriorityLowBg
+                            }
+                            val selectedFg = when (priority) {
+                                Priority.HIGH   -> if (isDark) Color(0xFFFFB4AB) else PriorityHighText
+                                Priority.MEDIUM -> if (isDark) Color(0xFFD3C5B5) else PriorityMedText
+                                Priority.LOW    -> if (isDark) Color(0xFFBAC8DB) else PriorityLowText
+                            }
                             FilterChip(
                                 selected = selected,
                                 onClick = { viewModel.onPriorityChange(priority) },
                                 label = { Text(priority.name, style = MaterialTheme.typography.labelMedium) },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = when (priority) {
-                                        Priority.HIGH   -> PriorityHighBg
-                                        Priority.MEDIUM -> PriorityMedBg
-                                        Priority.LOW    -> PriorityLowBg
-                                    },
-                                    selectedLabelColor = when (priority) {
-                                        Priority.HIGH   -> PriorityHighText
-                                        Priority.MEDIUM -> PriorityMedText
-                                        Priority.LOW    -> PriorityLowText
-                                    },
+                                    selectedContainerColor = selectedBg,
+                                    selectedLabelColor = selectedFg,
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                     labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -147,7 +150,7 @@ fun AddEditTaskScreen(
                         placeholder = { Text("List specific resources or sub-tasks here...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryNavy, unfocusedBorderColor = OutlineVariant,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
                         )
                     )
@@ -167,14 +170,14 @@ fun AddEditTaskScreen(
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 enabled = !uiState.isLoading,
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryNavy)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
                 } else {
-                    Icon(Icons.Filled.Save, null, tint = Color.White)
+                    Icon(Icons.Filled.Save, null, tint = MaterialTheme.colorScheme.onPrimary)
                     Spacer(Modifier.width(8.dp))
-                    Text("Save Task", style = MaterialTheme.typography.titleMedium, color = Color.White)
+                    Text("Save Task", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
 

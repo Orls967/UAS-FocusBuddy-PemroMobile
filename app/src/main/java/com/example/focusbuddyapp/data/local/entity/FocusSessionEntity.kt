@@ -16,7 +16,7 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.SET_NULL
         )
     ],
-    indices = [Index("linked_task_id")]
+    indices = [Index("linked_task_id"), Index("end_time")]
 )
 data class FocusSessionEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

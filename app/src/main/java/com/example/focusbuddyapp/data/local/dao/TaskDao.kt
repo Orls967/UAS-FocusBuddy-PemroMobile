@@ -42,6 +42,27 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE due_date >= :startOfDay AND due_date < :endOfDay ORDER BY due_date ASC")
     fun getTodayTasks(startOfDay: Long, endOfDay: Long): Flow<List<TaskEntity>>
 
+    @Query("""
+        SELECT t.* FROM tasks t
+        WHERE t.is_completed = 1
+          AND EXISTS (
+              SELECT 1 FROM focus_sessions fs
+              WHERE fs.linked_task_id = t.id
+                AND fs.end_time >= :startOfDay
+                AND fs.end_time < :endOfDay
+          )
+        ORDER BY (
+            SELECT MAX(fs2.end_time) FROM focus_sessions fs2
+            WHERE fs2.linked_task_id = t.id
+              AND fs2.end_time >= :startOfDay
+              AND fs2.end_time < :endOfDay
+        ) DESC
+    """)
+    fun getCompletedTodayTasks(startOfDay: Long, endOfDay: Long): Flow<List<TaskEntity>>
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE user_id = :userId")
+    suspend fun getTaskCountForUser(userId: Int): Int
+
     @Query("SELECT COUNT(*) FROM tasks WHERE is_completed = 1 AND due_date >= :startOfDay AND due_date < :endOfDay")
     fun getCompletedTodayCount(startOfDay: Long, endOfDay: Long): Flow<Int>
 

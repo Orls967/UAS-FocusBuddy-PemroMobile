@@ -116,4 +116,15 @@ class TaskRepositoryImpl(
         val end = start + 24 * 60 * 60 * 1000L
         return start to end
     }
+
+    override fun getCompletedTodayTasks(): Flow<List<Task>> {
+        val (start, end) = todayBounds()
+        return taskDao.getCompletedTodayTasks(start, end).map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun getTaskCountForUser(userId: Int): Int = withContext(Dispatchers.IO) {
+        taskDao.getTaskCountForUser(userId)
+    }
 }

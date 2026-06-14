@@ -11,16 +11,18 @@ data class ProgressUiState(
     val weeklyData: Map<String, Int> = emptyMap(),   // "MON" -> minutes
     val totalFocusMinutes: Int = 0,
     val completedTaskCount: Int = 0,
+    val focusSessionsCount: Int = 0,
     val bestDay: String = "Thursday",
     val consistencyPercent: Int = 0,
     val deepWorkHours: Float = 0f,
-    val rank: String = "TOP 5",
     val insightText: String = "Your focus peak usually happens mid-week. Harness this momentum!",
     val isLoading: Boolean = true
 )
 
 class ProgressViewModel : ViewModel() {
     private val getWeeklyFocusUseCase = AppModule.getWeeklyFocusDataUseCase
+    private val taskRepository = AppModule.taskRepository
+    private val focusSessionRepository = AppModule.focusSessionRepository
 
     private val _uiState = MutableStateFlow(ProgressUiState())
     val uiState: StateFlow<ProgressUiState> = _uiState.asStateFlow()
@@ -30,13 +32,15 @@ class ProgressViewModel : ViewModel() {
     private fun loadProgress() = viewModelScope.launch {
         combine(
             getWeeklyFocusUseCase(),
-            AppModule.browseTasksUseCase()
-        ) { weeklyData, tasks ->
+            taskRepository.getAllTasks(),
+            focusSessionRepository.getAllSessions()
+        ) { weeklyData, tasks, sessions ->
             val total = weeklyData.values.sum()
             val bestDay = weeklyData.maxByOrNull { it.value }?.key ?: "—"
             val daysWithFocus = weeklyData.values.count { it > 0 }
             val consistency = if (weeklyData.isNotEmpty()) (daysWithFocus * 100 / 7) else 0
             val completedCount = tasks.count { it.isCompleted }
+            val sessionCount = sessions.count { it.endTime != null }
 
             ProgressUiState(
                 weeklyData = weeklyData,
@@ -45,6 +49,7 @@ class ProgressViewModel : ViewModel() {
                 consistencyPercent = consistency,
                 deepWorkHours = total / 60f,
                 completedTaskCount = completedCount,
+                focusSessionsCount = sessionCount,
                 isLoading = false
             )
         }.collect { state ->

@@ -45,7 +45,7 @@ class SplashViewModel : ViewModel() {
         if (isValid) {
             _uiState.value = SplashUiState.NavigateToDashboard
         } else {
-            AppModule.userPreferences.clearAll()
+            AppModule.userPreferences.clearAuthSession()
             _uiState.value = SplashUiState.NavigateToLogin
         }
     }

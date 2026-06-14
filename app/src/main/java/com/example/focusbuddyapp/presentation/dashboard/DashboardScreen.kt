@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
@@ -30,6 +29,7 @@ fun DashboardScreen(
     onNavigateToTask: (Int) -> Unit,
     onNavigateToTimer: () -> Unit,
     onNavigateToTaskList: () -> Unit,
+    onNavigateToProgress: () -> Unit,
     onLogout: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -63,7 +63,7 @@ fun DashboardScreen(
                             contentScale = ContentScale.Crop
                         )
                     } else {
-                        Icon(Icons.Filled.Person, null, tint = PrimaryNavy)
+                        Icon(Icons.Filled.Person, null, tint = MaterialTheme.colorScheme.primary)
                     }
                 }
                 Spacer(Modifier.width(12.dp))
@@ -79,7 +79,6 @@ fun DashboardScreen(
                 Column(Modifier.padding(16.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text("TASKS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Icon(Icons.Filled.Assignment, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                     }
                     Spacer(Modifier.height(4.dp))
                     Text("${uiState.completedTodayCount}", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground)
@@ -91,11 +90,17 @@ fun DashboardScreen(
             Spacer(Modifier.height(12.dp))
 
             // Focus progress card
-            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onNavigateToProgress),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
                 Column(Modifier.padding(16.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text("YOUR PROGRESS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Icon(Icons.Filled.Timer, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                     }
                     Spacer(Modifier.height(4.dp))
                     val focusHours = uiState.todayFocusMinutes / 60
@@ -105,13 +110,13 @@ fun DashboardScreen(
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text("${focusHours}h", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground)
                         Spacer(Modifier.width(4.dp))
-                        Text("${goalHours}h ${goalMin}m", style = MaterialTheme.typography.titleMedium, color = PrimaryTerracotta)
+                        Text("${goalHours}h ${goalMin}m", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.secondary)
                     }
                     Spacer(Modifier.height(8.dp))
                     LinearProgressIndicator(
                         progress = { focusProgress },
                         modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(50)),
-                        color = PrimaryNavy,
+                        color = MaterialTheme.colorScheme.primary,
                         trackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                     Spacer(Modifier.height(4.dp))
@@ -125,7 +130,7 @@ fun DashboardScreen(
             Card(
                 modifier = Modifier.fillMaxWidth().clickable(onClick = onNavigateToTimer),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = PrimaryNavy),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
                 elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Row(
@@ -133,11 +138,11 @@ fun DashboardScreen(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Filled.PlayArrow, null, tint = Color.White, modifier = Modifier.size(28.dp))
+                    Icon(Icons.Filled.PlayArrow, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(28.dp))
                     Spacer(Modifier.width(12.dp))
                     Column {
-                        Text("Start Focusing", style = MaterialTheme.typography.titleLarge, color = Color.White)
-                        Text("Deep work session: 45 min", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.7f))
+                        Text("Start Focusing", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onPrimary)
+                        Text("Deep work session: 45 min", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f))
                     }
                 }
             }
@@ -151,7 +156,7 @@ fun DashboardScreen(
                 elevation = CardDefaults.cardElevation(1.dp)
             ) {
                 Column(Modifier.padding(16.dp)) {
-                    Text("99", style = MaterialTheme.typography.labelLarge.copy(fontSize = 20.sp), color = PrimaryTerracotta)
+                    Text("99", style = MaterialTheme.typography.labelLarge.copy(fontSize = 20.sp), color = MaterialTheme.colorScheme.secondary)
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = "\"${uiState.quote.content}\"",
@@ -168,7 +173,7 @@ fun DashboardScreen(
             // Today's tasks
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text("Today's Tasks", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
-                TextButton(onClick = onNavigateToTaskList) { Text("View All →", color = PrimaryTerracotta) }
+                TextButton(onClick = onNavigateToTaskList) { Text("View All →", color = MaterialTheme.colorScheme.secondary) }
             }
 
             Spacer(Modifier.height(8.dp))

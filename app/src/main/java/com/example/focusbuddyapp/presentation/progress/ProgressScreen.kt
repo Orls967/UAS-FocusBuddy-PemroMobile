@@ -18,7 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.focusbuddyapp.ui.theme.*
 
 @Composable
-fun ProgressScreen(viewModel: ProgressViewModel) {
+fun ProgressScreen(viewModel: ProgressViewModel, onNavigateToTaskList: () -> Unit) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     val maxMinutes = uiState.weeklyData.values.maxOrNull()?.takeIf { it > 0 } ?: 1
@@ -62,7 +62,7 @@ fun ProgressScreen(viewModel: ProgressViewModel) {
                                         .width(28.dp)
                                         .height((100 * ratio + 4).dp)
                                         .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
-                                        .background(if (ratio > 0) PrimaryNavy else MaterialTheme.colorScheme.surfaceVariant)
+                                        .background(if (ratio > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(day.take(3), style = MaterialTheme.typography.labelSmall, color = if (minutes > 0 && minutes == uiState.weeklyData.values.max()) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = if (minutes == uiState.weeklyData.values.maxOrNull()) FontWeight.Bold else FontWeight.Normal)
@@ -82,12 +82,12 @@ fun ProgressScreen(viewModel: ProgressViewModel) {
                         Text(": ${uiState.totalFocusMinutes / 60}h", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
                         Text("Tasks Completed: ${uiState.completedTaskCount}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(4.dp))
-                        LinearProgressIndicator(progress = { (uiState.consistencyPercent / 100f) }, modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(50)), color = PrimaryNavy, trackColor = MaterialTheme.colorScheme.surfaceVariant)
+                        LinearProgressIndicator(progress = { (uiState.consistencyPercent / 100f) }, modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(50)), color = MaterialTheme.colorScheme.primary, trackColor = MaterialTheme.colorScheme.surfaceVariant)
                     }
                 }
                 Card(modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                     Column(Modifier.padding(16.dp)) {
-                        Icon(Icons.Filled.Star, null, tint = PrimaryTerracotta, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Filled.Star, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp))
                         Text("Weekly Best", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
                         Text(": ", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(uiState.bestDay, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold)
@@ -100,7 +100,7 @@ fun ProgressScreen(viewModel: ProgressViewModel) {
             // Insight card
             Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                 Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.Lightbulb, null, tint = PrimaryNavy, modifier = Modifier.size(32.dp))
+                    Icon(Icons.Filled.Lightbulb, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
                     Spacer(Modifier.height(8.dp))
                     Text(
                         "You've Spent ${(uiState.totalFocusMinutes / 60f).toInt()} Hours, Working on a Task at ${uiState.bestDay}!",
@@ -112,10 +112,10 @@ fun ProgressScreen(viewModel: ProgressViewModel) {
                     Text(uiState.insightText, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(12.dp))
                     Button(
-                        onClick = {},
+                        onClick = onNavigateToTaskList,
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryNavy)
-                    ) { Text("Keep Going!!", color = Color.White) }
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) { Text("Keep Going!!", color = MaterialTheme.colorScheme.onPrimary) }
                 }
             }
 
@@ -124,16 +124,9 @@ fun ProgressScreen(viewModel: ProgressViewModel) {
             // Stats row
             Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                 Row(Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    StatItem("CONSISTENCY", "${uiState.consistencyPercent}%")
-                    StatItem("DEEP WORK", "${String.format("%.1f", uiState.deepWorkHours)}h")
-                    Box {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("RANK", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Surface(shape = RoundedCornerShape(4.dp), color = PrimaryTerracotta) {
-                                Text(uiState.rank, style = MaterialTheme.typography.labelLarge, color = Color.White, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
-                            }
-                        }
-                    }
+                    StatItem("COMPLETED", "${uiState.completedTaskCount}")
+                    StatItem("SESSIONS", "${uiState.focusSessionsCount}")
+                    StatItem("MINUTES", "${uiState.totalFocusMinutes}m")
                 }
             }
 

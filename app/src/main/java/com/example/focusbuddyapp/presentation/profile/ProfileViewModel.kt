@@ -16,7 +16,9 @@ data class ProfileUiState(
     val totalFocusMinutes: Int = 0,
     val isLoading: Boolean = true,
     val profilePhotoUri: String? = null,
-    val isDarkMode: Boolean = false
+    val isDarkMode: Boolean = false,
+    val profileError: String? = null,
+    val isSaving: Boolean = false
 )
 
 private data class ProfilePrefsData(
@@ -69,11 +71,23 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun setPomodoroMinutes(minutes: Int) = viewModelScope.launch {
-        userPreferences.saveFocusSettings(minutes, _uiState.value.breakMinutes)
-    }
-
-    fun setBreakMinutes(minutes: Int) = viewModelScope.launch {
-        userPreferences.saveFocusSettings(_uiState.value.pomodoroMinutes, minutes)
+        val breakMin = when (minutes) {
+            15 -> 3
+            20 -> 4
+            25 -> 5
+            30 -> 6
+            35 -> 7
+            40 -> 8
+            45 -> 9
+            50 -> 10
+            55 -> 11
+            60 -> 12
+            65 -> 13
+            70 -> 14
+            75 -> 15
+            else -> minutes / 5
+        }
+        userPreferences.saveFocusSettings(minutes, breakMin)
     }
 
     fun setNotificationsEnabled(enabled: Boolean) = viewModelScope.launch {
@@ -86,8 +100,30 @@ class ProfileViewModel : ViewModel() {
 
     fun logout() = viewModelScope.launch { logoutUseCase() }
 
-    fun setProfilePhoto(uri: String?) = viewModelScope.launch {
-        userPreferences.saveProfilePhotoUri(uri)
+    fun updateProfile(name: String, photoUri: String?, onSuccess: () -> Unit) = viewModelScope.launch {
+        val trimmedName = name.trim()
+        if (trimmedName.isEmpty()) {
+            _uiState.value = _uiState.value.copy(profileError = "Nama tidak boleh kosong")
+            return@launch
+        }
+        
+        val currentUser = _uiState.value.user ?: return@launch
+        _uiState.value = _uiState.value.copy(isSaving = true)
+        
+        val result = authRepository.updateProfile(currentUser.id, trimmedName, photoUri)
+        if (result.isSuccess) {
+            _uiState.value = _uiState.value.copy(profileError = null, isSaving = false)
+            onSuccess()
+        } else {
+            _uiState.value = _uiState.value.copy(
+                profileError = result.exceptionOrNull()?.message ?: "Gagal memperbarui profil",
+                isSaving = false
+            )
+        }
+    }
+
+    fun clearProfileError() {
+        _uiState.value = _uiState.value.copy(profileError = null)
     }
 }
 

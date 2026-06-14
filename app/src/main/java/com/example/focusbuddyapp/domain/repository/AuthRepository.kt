@@ -10,4 +10,5 @@ interface AuthRepository {
     fun getCurrentUser(): Flow<User?>
     fun isLoggedIn(): Boolean
     fun getAuthToken(): String?
+    suspend fun updateProfile(userId: Int, name: String, avatarUrl: String?): Result<Unit>
 }

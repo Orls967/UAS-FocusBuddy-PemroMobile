@@ -23,11 +23,27 @@ import androidx.compose.ui.platform.LocalContext
 import android.content.Intent
 import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var showEditProfileDialog by remember { mutableStateOf(false) }
+    var editName by remember { mutableStateOf("") }
+    var editPhotoUri by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(showEditProfileDialog) {
+        if (showEditProfileDialog) {
+            editName = uiState.user?.name ?: ""
+            editPhotoUri = uiState.profilePhotoUri
+            viewModel.clearProfileError()
+        }
+    }
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
@@ -38,7 +54,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-                viewModel.setProfilePhoto(uri.toString())
+                editPhotoUri = uri.toString()
             }
         }
     )
@@ -47,71 +63,647 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
     var showPrivacyDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
 
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val maxDialogHeight = screenHeight * 0.75f
+
     if (showFaqDialog) {
-        AlertDialog(
+        Dialog(
             onDismissRequest = { showFaqDialog = false },
-            title = { Text("FAQ & Support") },
-            text = {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    Text("1. Bagaimana cara memulai Focus Session?", fontWeight = FontWeight.Bold)
-                    Text("Pilih tugas dari daftar tugas Anda, lalu buka tab Focus dan tekan tombol 'Start Focus'.")
-                    Spacer(Modifier.height(8.dp))
-                    Text("2. Apa itu Mode Break?", fontWeight = FontWeight.Bold)
-                    Text("Setelah sesi focus selesai, Anda akan ditawarkan untuk memulai waktu istirahat (Break) agar otak Anda tetap segar.")
-                    Spacer(Modifier.height(8.dp))
-                    Text("3. Mengapa data saya terhapus?", fontWeight = FontWeight.Bold)
-                    Text("Aplikasi ini menyimpan data secara lokal. Jika Anda logout atau menghapus data aplikasi, data tugas Anda mungkin akan terhapus.")
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showFaqDialog = false }) {
-                    Text("Tutup")
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .heightIn(max = maxDialogHeight),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "FAQ & Support",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            text = "1. Bagaimana cara memulai Focus Session?",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
+                                lineHeight = 22.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = "Pilih tugas dari daftar tugas Anda, lalu buka tab Focus dan tekan tombol 'Start Focus'.",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                        Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            text = "2. Apa itu Mode Break?",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
+                                lineHeight = 22.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = "Setelah sesi focus selesai, Anda akan ditawarkan untuk memulai waktu istirahat (Break) agar otak Anda tetap segar.",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                        Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            text = "3. Mengapa data saya terhapus?",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
+                                lineHeight = 22.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = "Aplikasi ini menyimpan data secara lokal. Jika Anda logout atau menghapus data aplikasi, data tugas Anda mungkin akan terhapus.",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(
+                            onClick = { showFaqDialog = false },
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Tutup",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+                    }
                 }
             }
-        )
+        }
     }
 
     if (showPrivacyDialog) {
-        AlertDialog(
+        Dialog(
             onDismissRequest = { showPrivacyDialog = false },
-            title = { Text("Privacy Policy") },
-            text = {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    Text("Kami menghormati privasi Anda. FocusBuddy berkomitmen melindungi informasi pribadi Anda:")
-                    Spacer(Modifier.height(8.dp))
-                    Text("• Penyimpanan Lokal: Semua data tugas dan sesi focus Anda disimpan di dalam database lokal perangkat Anda.")
-                    Text("• Sinkronisasi Opsional: Jika fitur cloud diaktifkan, data Anda disinkronkan dengan server kami secara aman.")
-                    Text("• Keamanan Akun: Password Anda disimpan menggunakan enkripsi satu arah yang aman.")
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showPrivacyDialog = false }) {
-                    Text("Tutup")
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .heightIn(max = maxDialogHeight),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "Privacy Policy",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            text = "Kami menghormati privasi Anda. FocusBuddy berkomitmen melindungi informasi pribadi Anda:",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        Spacer(Modifier.height(16.dp))
+
+                        // Bullet Point 1
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "•",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                            Column {
+                                Text(
+                                    text = "Penyimpanan Lokal",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 16.sp,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = "Semua data tugas dan sesi focus Anda disimpan di dalam database lokal perangkat Anda.",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 14.sp,
+                                        lineHeight = 20.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+
+                        // Bullet Point 2
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "•",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                            Column {
+                                Text(
+                                    text = "Sinkronisasi Opsional",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 16.sp,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = "Jika fitur cloud diaktifkan, data Anda disinkronkan dengan server kami secara aman.",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 14.sp,
+                                        lineHeight = 20.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+
+                        // Bullet Point 3
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "•",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                            Column {
+                                Text(
+                                    text = "Keamanan Akun",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 16.sp,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = "Password Anda disimpan menggunakan enkripsi satu arah yang aman.",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 14.sp,
+                                        lineHeight = 20.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(
+                            onClick = { showPrivacyDialog = false },
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Tutup",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+                    }
                 }
             }
-        )
+        }
     }
 
     if (showAboutDialog) {
-        AlertDialog(
+        Dialog(
             onDismissRequest = { showAboutDialog = false },
-            title = { Text("About FocusBuddy") },
-            text = {
-                Column {
-                    Text("FocusBuddy App", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                    Text("Versi 1.0.0-UAS")
-                    Spacer(Modifier.height(8.dp))
-                    Text("Aplikasi produktivitas cerdas yang membantu mahasiswa dan akademisi mengelola tugas dan meningkatkan fokus belajar menggunakan teknik Pomodoro.")
-                    Spacer(Modifier.height(8.dp))
-                    Text("Dikembangkan untuk memenuhi syarat UAS Pemrograman Mobile.")
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showAboutDialog = false }) {
-                    Text("Tutup")
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .heightIn(max = maxDialogHeight),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "About FocusBuddy",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            text = "FocusBuddy App",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Versi 1.0.0-UAS",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                        Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            text = "Aplikasi produktivitas cerdas yang membantu mahasiswa dan akademisi mengelola tugas dan meningkatkan fokus belajar menggunakan teknik Pomodoro.",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            text = "Dikembangkan untuk memenuhi syarat UAS Pemrograman Mobile.",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(
+                            onClick = { showAboutDialog = false },
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Tutup",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+                    }
                 }
             }
-        )
+        }
+    }
+
+    if (showEditProfileDialog) {
+        Dialog(
+            onDismissRequest = { showEditProfileDialog = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .heightIn(max = maxDialogHeight),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                ) {
+                    // --- HEADER SECTION ---
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp)
+                    ) {
+                        Text(
+                            text = "Edit Profile",
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 22.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Perbarui informasi profil akun Anda",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+
+                    // --- CONTENT SECTION (SCROLLABLE) ---
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // --- AVATAR SECTION ---
+                        Box(
+                            modifier = Modifier
+                                .size(96.dp)
+                                .clip(CircleShape)
+                                .border(2.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (editPhotoUri != null) {
+                                AsyncImage(
+                                    model = editPhotoUri,
+                                    contentDescription = "Profile Photo Preview",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Filled.Person,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(52.dp)
+                                )
+                            }
+                        }
+                        
+                        Spacer(Modifier.height(8.dp))
+                        
+                        TextButton(
+                            onClick = {
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            },
+                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                        ) {
+                            Icon(Icons.Filled.CameraAlt, null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "Ganti Foto",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+                        
+                        Spacer(Modifier.height(24.dp))
+                        
+                        // --- ACCOUNT INFORMATION SECTION ---
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = "ACCOUNT INFORMATION",
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                            
+                            Spacer(Modifier.height(8.dp))
+                            
+                            OutlinedTextField(
+                                value = uiState.user?.email ?: "",
+                                onValueChange = {},
+                                label = { Text("Email (Read-Only)") },
+                                readOnly = true,
+                                enabled = false,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                )
+                            )
+                        }
+                        
+                        Spacer(Modifier.height(24.dp))
+                        
+                        // --- PROFILE INFORMATION SECTION ---
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = "PROFILE INFORMATION",
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                            
+                            Spacer(Modifier.height(8.dp))
+                            
+                            OutlinedTextField(
+                                value = editName,
+                                onValueChange = { editName = it },
+                                label = { Text("Nama Lengkap") },
+                                placeholder = { Text("Masukkan nama lengkap Anda") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            )
+                            
+                            if (uiState.profileError != null) {
+                                Spacer(Modifier.height(6.dp))
+                                Text(
+                                    text = uiState.profileError ?: "",
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontWeight = FontWeight.SemiBold
+                                    ),
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    // --- ACTION AREA ---
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedButton(
+                            onClick = { showEditProfileDialog = false },
+                            enabled = !uiState.isSaving,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        ) {
+                            Text(
+                                text = "Batal",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                        }
+                        
+                        Button(
+                            onClick = {
+                                viewModel.updateProfile(editName, editPhotoUri) {
+                                    showEditProfileDialog = false
+                                }
+                            },
+                            enabled = !uiState.isSaving,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            if (uiState.isSaving) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Text(
+                                    text = "Simpan",
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Scaffold(containerColor = MaterialTheme.colorScheme.background) { paddingValues ->
@@ -136,12 +728,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
                         modifier = Modifier
                             .size(72.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .clickable {
-                                photoPickerLauncher.launch(
-                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                )
-                            },
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         if (uiState.profilePhotoUri != null) {
@@ -154,24 +741,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
                                 contentScale = ContentScale.Crop
                             )
                         } else {
-                            Icon(Icons.Filled.Person, null, tint = PrimaryNavy, modifier = Modifier.size(40.dp))
-                        }
-
-                        // Small camera edit icon overlay at the bottom right of the avatar circle
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .size(22.dp)
-                                .background(PrimaryNavy, CircleShape)
-                                .border(1.5.dp, Color.White, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.CameraAlt,
-                                contentDescription = "Change Photo",
-                                tint = Color.White,
-                                modifier = Modifier.size(12.dp)
-                            )
+                            Icon(Icons.Filled.Person, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp))
                         }
                     }
                     Spacer(Modifier.width(16.dp))
@@ -181,6 +751,18 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
                         Spacer(Modifier.height(4.dp))
                         Surface(shape = RoundedCornerShape(4.dp), color = PriorityHighBg) {
                             Text("Academic Focus Champion", style = MaterialTheme.typography.labelSmall, color = PriorityHighText, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = { showEditProfileDialog = true },
+                            modifier = Modifier.height(32.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                        ) {
+                            Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text("Edit Profile", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -201,36 +783,29 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Pomodoro settings
+            // Focus settings
             Text("Focus Settings", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(8.dp))
             Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                 Column(Modifier.padding(16.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Pomodoro Duration", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
-                        Text("${uiState.pomodoroMinutes} min", style = MaterialTheme.typography.labelLarge, color = PrimaryNavy)
+                        Text("Focus Duration", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+                        Text("${uiState.pomodoroMinutes} min", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                     }
                     Slider(
                         value = uiState.pomodoroMinutes.toFloat(),
                         onValueChange = { viewModel.setPomodoroMinutes(it.toInt()) },
-                        valueRange = 15f..60f,
-                        steps = 8,
-                        colors = SliderDefaults.colors(thumbColor = PrimaryNavy, activeTrackColor = PrimaryNavy, inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant)
+                        valueRange = 15f..75f,
+                        steps = 11,
+                        colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary, inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant)
                     )
 
                     Divider(Modifier.padding(vertical = 8.dp))
 
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Break Duration", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
-                        Text("${uiState.breakMinutes} min", style = MaterialTheme.typography.labelLarge, color = PrimaryNavy)
+                        Text("Estimated Break", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+                        Text("${uiState.breakMinutes} min", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                     }
-                    Slider(
-                        value = uiState.breakMinutes.toFloat(),
-                        onValueChange = { viewModel.setBreakMinutes(it.toInt()) },
-                        valueRange = 5f..20f,
-                        steps = 2,
-                        colors = SliderDefaults.colors(thumbColor = PrimaryNavy, activeTrackColor = PrimaryNavy, inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant)
-                    )
 
                     Divider(Modifier.padding(vertical = 8.dp))
 
@@ -239,7 +814,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
                         Switch(
                             checked = uiState.notificationsEnabled,
                             onCheckedChange = viewModel::setNotificationsEnabled,
-                            colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = PrimaryNavy)
+                            colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = MaterialTheme.colorScheme.primary)
                         )
                     }
 
@@ -250,7 +825,7 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
                         Switch(
                             checked = uiState.isDarkMode,
                             onCheckedChange = viewModel::setDarkMode,
-                            colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = PrimaryNavy)
+                            colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = MaterialTheme.colorScheme.primary)
                         )
                     }
                 }

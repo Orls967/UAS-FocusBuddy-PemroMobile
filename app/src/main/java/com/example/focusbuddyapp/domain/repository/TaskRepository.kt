@@ -21,4 +21,10 @@ interface TaskRepository {
 
     // Sync
     suspend fun syncWithRemote()
+
+    // Today's completed tasks (derived from sessions)
+    fun getCompletedTodayTasks(): Flow<List<Task>>
+
+    // Demo count
+    suspend fun getTaskCountForUser(userId: Int): Int
 }

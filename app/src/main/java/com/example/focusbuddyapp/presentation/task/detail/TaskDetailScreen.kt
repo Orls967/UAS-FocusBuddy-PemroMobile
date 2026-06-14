@@ -171,23 +171,6 @@ fun TaskDetailScreen(
             }
 
             Spacer(Modifier.height(16.dp))
-
-            // Complete / Uncomplete toggle
-            Button(
-                onClick = viewModel::toggleComplete,
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (task.isCompleted) MaterialTheme.colorScheme.surfaceVariant else SuccessGreen
-                )
-            ) {
-                Text(
-                    if (task.isCompleted) "Mark Incomplete" else "Mark Complete",
-                    color = if (task.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else Color.White
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
         }
     }
 }

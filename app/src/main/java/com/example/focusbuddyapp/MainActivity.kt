@@ -14,6 +14,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        com.example.focusbuddyapp.ui.util.NotificationHelper.createNotificationChannel(this)
+        
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            androidx.core.app.ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                101
+            )
+        }
+        
         setContent {
             val darkTheme by AppModule.userPreferences.isDarkMode.collectAsState(initial = false)
             FocusBuddyTheme(darkTheme = darkTheme) {

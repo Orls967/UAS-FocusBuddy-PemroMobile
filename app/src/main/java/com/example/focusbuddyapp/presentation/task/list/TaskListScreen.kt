@@ -28,7 +28,7 @@ fun TaskListScreen(
     onNavigateToAddTask: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val filters = listOf("ALL", "HIGH", "MEDIUM", "LOW", "DONE")
+    val filters = listOf("ALL", "HIGH", "MEDIUM", "LOW")
 
     Scaffold(
         floatingActionButton = {
@@ -70,8 +70,6 @@ fun TaskListScreen(
                 }
                 Spacer(Modifier.width(12.dp))
                 Text("Hello, ${uiState.userName.ifBlank { "Scholar" }}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
-                Spacer(Modifier.weight(1f))
-                Icon(Icons.Filled.Settings, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             Spacer(Modifier.height(16.dp))
@@ -119,7 +117,7 @@ fun TaskListScreen(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Task Queue", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
                 Text(
-                    "${uiState.filteredTasks.size} Tasks remaining",
+                    "${uiState.activeTasks.size} Tasks remaining",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -132,7 +130,7 @@ fun TaskListScreen(
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = PrimaryNavy)
                 }
-            } else if (uiState.filteredTasks.isEmpty()) {
+            } else if (uiState.activeTasks.isEmpty() && uiState.completedTasks.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Filled.Assignment, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(48.dp))
@@ -146,15 +144,39 @@ fun TaskListScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    items(
-                        items = uiState.filteredTasks,
-                        key = { task -> task.id }
-                    ) { task ->
-                        TaskCard(
-                            task = task,
-                            onCheckedChange = { isChecked -> viewModel.toggleComplete(task.id, isChecked) },
-                            onClick = { onNavigateToTask(task.id) }
-                        )
+                    if (uiState.activeTasks.isNotEmpty()) {
+                        item {
+                            Text("Active Tasks", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                        }
+                        items(
+                            items = uiState.activeTasks,
+                            key = { task -> "active_${task.id}" }
+                        ) { task ->
+                            TaskCard(
+                                task = task,
+                                onCheckedChange = {},
+                                onClick = { onNavigateToTask(task.id) }
+                            )
+                        }
+                    }
+
+                    if (uiState.completedTasks.isNotEmpty()) {
+                        item {
+                            Spacer(Modifier.height(12.dp))
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                            Spacer(Modifier.height(12.dp))
+                            Text("Completed Today", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                        }
+                        items(
+                            items = uiState.completedTasks,
+                            key = { task -> "completed_${task.id}" }
+                        ) { task ->
+                            TaskCard(
+                                task = task,
+                                onCheckedChange = {},
+                                onClick = { onNavigateToTask(task.id) }
+                            )
+                        }
                     }
                 }
             }

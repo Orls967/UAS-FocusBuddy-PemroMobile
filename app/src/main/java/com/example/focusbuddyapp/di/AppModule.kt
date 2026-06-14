@@ -37,7 +37,7 @@ object AppModule {
     private const val BASE_URL = "https://api.focusbuddy.app/v1/"
     private const val QUOTE_URL = "https://api.quotable.io/"
 
-    private lateinit var appContext: Context
+    lateinit var appContext: Context
 
     fun init(context: Context) {
         appContext = context.applicationContext
@@ -97,7 +97,7 @@ object AppModule {
 
     // ─── Repositories ──────────────────────────────────────────────────────
     val authRepository: AuthRepository by lazy {
-        AuthRepositoryImpl(authApiService, userDao, userPreferences)
+        AuthRepositoryImpl(authApiService, userDao, userPreferences, taskDao, focusSessionDao)
     }
     val taskRepository: TaskRepository by lazy {
         TaskRepositoryImpl(taskDao, subTaskDao, taskApiService)

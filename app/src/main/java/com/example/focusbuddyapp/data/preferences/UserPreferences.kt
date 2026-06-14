@@ -25,6 +25,7 @@ class UserPreferences(private val context: Context) {
         val ACTIVE_TASK_ID = intPreferencesKey("active_task_id")
         val ACTIVE_TASK_TITLE = stringPreferencesKey("active_task_title")
         val DARK_MODE = booleanPreferencesKey("dark_mode")
+        val DEMO_DATA_SEEDED = booleanPreferencesKey("demo_data_seeded")
     }
 
     // Auth token
@@ -44,6 +45,7 @@ class UserPreferences(private val context: Context) {
     val activeTaskId: Flow<Int> = context.dataStore.data.map { it[ACTIVE_TASK_ID] ?: 0 }
     val activeTaskTitle: Flow<String> = context.dataStore.data.map { it[ACTIVE_TASK_TITLE] ?: "" }
     val isDarkMode: Flow<Boolean> = context.dataStore.data.map { it[DARK_MODE] ?: false }
+    val demoDataSeeded: Flow<Boolean> = context.dataStore.data.map { it[DEMO_DATA_SEEDED] ?: false }
 
     suspend fun saveAuthToken(token: String) {
         context.dataStore.edit { it[AUTH_TOKEN] = token }
@@ -101,6 +103,21 @@ class UserPreferences(private val context: Context) {
 
     suspend fun clearActiveTask() {
         context.dataStore.edit {
+            it.remove(ACTIVE_TASK_ID)
+            it.remove(ACTIVE_TASK_TITLE)
+        }
+    }
+
+    suspend fun setDemoDataSeeded(seeded: Boolean) {
+        context.dataStore.edit { it[DEMO_DATA_SEEDED] = seeded }
+    }
+
+    suspend fun clearAuthSession() {
+        context.dataStore.edit {
+            it.remove(AUTH_TOKEN)
+            it.remove(USER_ID)
+            it.remove(USER_NAME)
+            it.remove(USER_EMAIL)
             it.remove(ACTIVE_TASK_ID)
             it.remove(ACTIVE_TASK_TITLE)
         }

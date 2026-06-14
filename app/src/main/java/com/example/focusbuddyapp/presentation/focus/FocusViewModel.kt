@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.focusbuddyapp.di.AppModule
 import com.example.focusbuddyapp.domain.model.FocusSession
+import com.example.focusbuddyapp.domain.model.Task
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,9 @@ data class FocusUiState(
     val activeSessionId: Int? = null,
     val profilePhotoUri: String? = null,
     val isBreakMode: Boolean = false,
-    val showBreakDialog: Boolean = false
+    val showBreakDialog: Boolean = false,
+    val showNextTaskModal: Boolean = false,
+    val activeTasks: List<Task> = emptyList()
 ) {
     val progress: Float get() = 1f - (remainingSeconds.toFloat() / totalSeconds)
     val timerText: String get() {
@@ -66,6 +69,8 @@ class FocusViewModel : ViewModel() {
         }
         viewModelScope.launch {
             AppModule.userPreferences.pomodoroMinutes.collect { minutes ->
+                val breakMin = getBreakDurationForFocus(minutes)
+                _uiState.update { it.copy(breakDurationMinutes = breakMin) }
                 if (_uiState.value.timerState == TimerState.IDLE) {
                     val totalSecs = minutes * 60
                     _uiState.update {
@@ -78,16 +83,35 @@ class FocusViewModel : ViewModel() {
             }
         }
         viewModelScope.launch {
-            AppModule.userPreferences.breakMinutes.collect { minutes ->
-                _uiState.update { it.copy(breakDurationMinutes = minutes) }
+            AppModule.taskRepository.getAllTasks().collect { tasks ->
+                val active = tasks.filter { !it.isCompleted }
+                _uiState.update { it.copy(activeTasks = active) }
             }
+        }
+    }
+
+    fun getBreakDurationForFocus(focusMinutes: Int): Int {
+        return when (focusMinutes) {
+            15 -> 3
+            20 -> 4
+            25 -> 5
+            30 -> 6
+            35 -> 7
+            40 -> 8
+            45 -> 9
+            50 -> 10
+            55 -> 11
+            60 -> 12
+            65 -> 13
+            70 -> 14
+            75 -> 15
+            else -> focusMinutes / 5
         }
     }
 
     fun startTimer() = viewModelScope.launch {
         if (_uiState.value.timerState == TimerState.IDLE) {
             val activeTaskId = AppModule.userPreferences.activeTaskId.first()
-            // Create a new session record
             val session = FocusSession(
                 durationMinutes = _uiState.value.totalSeconds / 60,
                 breakDurationMinutes = _uiState.value.breakDurationMinutes,
@@ -109,16 +133,21 @@ class FocusViewModel : ViewModel() {
         stopSessionAndReset(showDialogAfter = false)
     }
 
-    fun startBreak() {
+    fun startBreakAuto() = viewModelScope.launch {
         timerJob?.cancel()
-        val totalSecs = _uiState.value.breakDurationMinutes * 60
+        saveCompletedSession()
+        
+        val pomodoroMinutes = AppModule.userPreferences.pomodoroMinutes.first()
+        val breakMin = getBreakDurationForFocus(pomodoroMinutes)
+        val totalSecs = breakMin * 60
         _uiState.update {
             it.copy(
                 isBreakMode = true,
                 showBreakDialog = false,
                 totalSeconds = totalSecs,
                 remainingSeconds = totalSecs,
-                timerState = TimerState.RUNNING
+                timerState = TimerState.RUNNING,
+                activeSessionId = null
             )
         }
         runTimer()
@@ -145,6 +174,18 @@ class FocusViewModel : ViewModel() {
                 remainingSeconds = totalSecs,
                 activeSessionId = null
             )
+        }
+    }
+
+    private suspend fun saveCompletedSession() {
+        val state = _uiState.value
+        state.activeSessionId?.let { id ->
+            val session = FocusSession(
+                id = id,
+                durationMinutes = state.totalSeconds / 60,
+                startTime = System.currentTimeMillis() - state.totalSeconds * 1000L
+            )
+            stopSessionUseCase(session)
         }
     }
 
@@ -175,7 +216,33 @@ class FocusViewModel : ViewModel() {
         }
     }
 
-    fun setBreakDuration(minutes: Int) = _uiState.update { it.copy(breakDurationMinutes = minutes) }
+    fun showNextTaskModal() {
+        _uiState.update { it.copy(showNextTaskModal = true) }
+    }
+
+    fun dismissNextTaskModal() {
+        _uiState.update { it.copy(showNextTaskModal = false) }
+    }
+
+    fun selectNextTaskAndStopBreak(task: Task) = viewModelScope.launch {
+        timerJob?.cancel()
+        
+        AppModule.userPreferences.saveActiveTask(task.id, task.title)
+        
+        val pomodoroMinutes = AppModule.userPreferences.pomodoroMinutes.first()
+        val totalSecs = pomodoroMinutes * 60
+        _uiState.update {
+            it.copy(
+                isBreakMode = false,
+                showNextTaskModal = false,
+                totalSeconds = totalSecs,
+                remainingSeconds = totalSecs,
+                timerState = TimerState.IDLE,
+                currentTaskTitle = task.title,
+                activeSessionId = null
+            )
+        }
+    }
 
     private fun runTimer() {
         timerJob?.cancel()
@@ -186,7 +253,23 @@ class FocusViewModel : ViewModel() {
             }
             if (_uiState.value.remainingSeconds == 0) {
                 if (!_uiState.value.isBreakMode) {
-                    stopSessionAndReset(showDialogAfter = true)
+                    val activeTaskId = AppModule.userPreferences.activeTaskId.first()
+                    if (activeTaskId != 0) {
+                        val activeTask = AppModule.taskRepository.getTaskById(activeTaskId)
+                        if (activeTask != null && !activeTask.isCompleted) {
+                            AppModule.toggleTaskCompleteUseCase(activeTaskId, true)
+                        }
+                    }
+                    
+                    val notifEnabled = AppModule.userPreferences.notificationsEnabled.first()
+                    if (notifEnabled) {
+                        com.example.focusbuddyapp.ui.util.NotificationHelper.showSessionCompleteNotification(
+                            AppModule.appContext,
+                            _uiState.value.currentTaskTitle
+                        )
+                    }
+                    
+                    startBreakAuto()
                 } else {
                     resetToIdle()
                 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -25,22 +26,66 @@ import androidx.compose.ui.draw.clip
 fun FocusScreen(viewModel: FocusViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    if (uiState.showBreakDialog) {
+    if (uiState.showNextTaskModal) {
         AlertDialog(
-            onDismissRequest = { viewModel.dismissBreakDialog() },
-            title = { Text("Focus Session Complete!") },
-            text = { Text("Hebat! Sesi focus Anda telah selesai. Apakah Anda ingin memulai waktu istirahat selama ${uiState.breakDurationMinutes} menit?") },
-            confirmButton = {
-                Button(
-                    onClick = { viewModel.startBreak() },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("Start Break")
+            onDismissRequest = { viewModel.dismissNextTaskModal() },
+            title = { Text("Pilih Tugas Berikutnya", style = MaterialTheme.typography.titleLarge) },
+            text = {
+                if (uiState.activeTasks.isEmpty()) {
+                    Text("Tidak ada tugas aktif di antrean.", style = MaterialTheme.typography.bodyMedium)
+                } else {
+                    androidx.compose.foundation.lazy.LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxWidth().heightIn(max = 300.dp)
+                    ) {
+                        items(uiState.activeTasks) { task ->
+                            var showDetail by remember { mutableStateOf(false) }
+                            Card(
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(task.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                            Spacer(Modifier.height(4.dp))
+                                            com.example.focusbuddyapp.ui.components.PriorityChip(priority = task.priority)
+                                        }
+                                        Spacer(Modifier.width(8.dp))
+                                        Button(
+                                            onClick = { viewModel.selectNextTaskAndStopBreak(task) },
+                                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryNavy),
+                                            shape = RoundedCornerShape(8.dp),
+                                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                                        ) {
+                                            Text("Pilih", color = Color.White)
+                                        }
+                                    }
+                                    if (task.description.isNotBlank()) {
+                                        Spacer(Modifier.height(4.dp))
+                                        TextButton(
+                                            onClick = { showDetail = !showDetail },
+                                            contentPadding = PaddingValues(0.dp)
+                                        ) {
+                                            Text(if (showDetail) "Sembunyikan Detail" else "Lihat Detail", style = MaterialTheme.typography.labelSmall)
+                                        }
+                                        if (showDetail) {
+                                            Text(task.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             },
-            dismissButton = {
-                TextButton(onClick = { viewModel.skipBreak() }) {
-                    Text("Skip Break")
+            confirmButton = {
+                TextButton(onClick = { viewModel.dismissNextTaskModal() }) {
+                    Text("Batal")
                 }
             }
         )
@@ -140,21 +185,17 @@ fun FocusScreen(viewModel: FocusViewModel) {
                 }
             }
 
-            Spacer(Modifier.height(20.dp))
-
-            // Break duration selector
-            Text("Break Duration", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                listOf(5, 10).forEach { minutes ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = uiState.breakDurationMinutes == minutes,
-                            onClick = { viewModel.setBreakDuration(minutes) },
-                            colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
-                        )
-                        Text("$minutes Minutes", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
-                    }
+            if (uiState.isBreakMode) {
+                Spacer(Modifier.height(10.dp))
+                Button(
+                    onClick = { viewModel.showNextTaskModal() },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(Icons.Filled.PlayArrow, null, tint = Color.White)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Start Next Task", color = Color.White)
                 }
             }
 

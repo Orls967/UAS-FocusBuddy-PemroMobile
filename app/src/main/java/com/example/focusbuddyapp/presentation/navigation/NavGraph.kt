@@ -117,6 +117,7 @@ fun NavGraph() {
                     onNavigateToTask = { taskId -> navController.navigate(Screen.TaskDetail.createRoute(taskId)) },
                     onNavigateToTimer = { navController.navigate(Screen.FocusTimer.route) },
                     onNavigateToTaskList = { navController.navigate(Screen.TaskList.route) },
+                    onNavigateToProgress = { navController.navigate(Screen.Progress.route) },
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(Screen.Dashboard.route) { inclusive = true }
@@ -141,7 +142,10 @@ fun NavGraph() {
 
             composable(Screen.Progress.route) {
                 val vm: ProgressViewModel = viewModel(factory = ProgressViewModelFactory())
-                ProgressScreen(viewModel = vm)
+                ProgressScreen(
+                    viewModel = vm,
+                    onNavigateToTaskList = { navController.navigate(Screen.TaskList.route) }
+                )
             }
 
             composable(Screen.Profile.route) {

@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 data class TaskListUiState(
-    val allTasks: List<Task> = emptyList(),
-    val filteredTasks: List<Task> = emptyList(),
+    val activeTasks: List<Task> = emptyList(),
+    val completedTasks: List<Task> = emptyList(),
     val searchQuery: String = "",
-    val selectedFilter: String = "ALL",   // "ALL" | "HIGH" | "MEDIUM" | "LOW" | "DONE"
+    val selectedFilter: String = "ALL",   // "ALL" | "HIGH" | "MEDIUM" | "LOW"
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
     val userName: String = "",
@@ -22,7 +22,7 @@ data class TaskListUiState(
 
 class TaskListViewModel : ViewModel() {
     private val browseTasksUseCase = AppModule.browseTasksUseCase
-    private val toggleTaskCompleteUseCase = AppModule.toggleTaskCompleteUseCase
+    private val taskRepository = AppModule.taskRepository
 
     private val _searchQuery = MutableStateFlow("")
     private val _selectedFilter = MutableStateFlow("ALL")
@@ -37,13 +37,26 @@ class TaskListViewModel : ViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeTasks() = viewModelScope.launch {
         combine(
-            browseTasksUseCase(),
-            _searchQuery,
-            _selectedFilter,
-            AppModule.userPreferences.userName,
-            AppModule.userPreferences.profilePhotoUri
-        ) { tasks, query, filter, name, photoUri ->
-            val filtered = tasks
+            listOf(
+                browseTasksUseCase(),
+                taskRepository.getCompletedTodayTasks(),
+                _searchQuery,
+                _selectedFilter,
+                AppModule.userPreferences.userName,
+                AppModule.userPreferences.profilePhotoUri
+            )
+        ) { array ->
+            @Suppress("UNCHECKED_CAST")
+            val tasks = array[0] as List<Task>
+            @Suppress("UNCHECKED_CAST")
+            val completedToday = array[1] as List<Task>
+            val query = array[2] as String
+            val filter = array[3] as String
+            val name = array[4] as String
+            val photoUri = array[5] as String?
+
+            val activeFiltered = tasks
+                .filter { !it.isCompleted }
                 .filter { task ->
                     val matchesQuery = query.isBlank() ||
                         task.title.contains(query, ignoreCase = true) ||
@@ -52,14 +65,28 @@ class TaskListViewModel : ViewModel() {
                         "HIGH"   -> task.priority.name == "HIGH"
                         "MEDIUM" -> task.priority.name == "MEDIUM"
                         "LOW"    -> task.priority.name == "LOW"
-                        "DONE"   -> task.isCompleted
                         else     -> true
                     }
                     matchesQuery && matchesFilter
                 }
+
+            val completedFiltered = completedToday
+                .filter { task ->
+                    val matchesQuery = query.isBlank() ||
+                        task.title.contains(query, ignoreCase = true) ||
+                        task.description.contains(query, ignoreCase = true)
+                    val matchesFilter = when (filter) {
+                        "HIGH"   -> task.priority.name == "HIGH"
+                        "MEDIUM" -> task.priority.name == "MEDIUM"
+                        "LOW"    -> task.priority.name == "LOW"
+                        else     -> true
+                    }
+                    matchesQuery && matchesFilter
+                }
+
             TaskListUiState(
-                allTasks = tasks,
-                filteredTasks = filtered,
+                activeTasks = activeFiltered,
+                completedTasks = completedFiltered,
                 searchQuery = query,
                 selectedFilter = filter,
                 isLoading = false,
@@ -73,10 +100,6 @@ class TaskListViewModel : ViewModel() {
 
     fun onSearchChange(query: String) { _searchQuery.value = query }
     fun onFilterChange(filter: String) { _selectedFilter.value = filter }
-
-    fun toggleComplete(taskId: Int, isCompleted: Boolean) = viewModelScope.launch {
-        toggleTaskCompleteUseCase(taskId, isCompleted)
-    }
 }
 
 class TaskListViewModelFactory : ViewModelProvider.Factory {
