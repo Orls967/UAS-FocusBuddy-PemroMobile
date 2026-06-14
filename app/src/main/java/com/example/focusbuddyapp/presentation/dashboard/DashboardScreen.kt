@@ -166,30 +166,24 @@ fun DashboardScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
-                        .padding(16.dp)
+                        .heightIn(min = 150.dp)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         text = "“",
                         style = MaterialTheme.typography.labelLarge.copy(fontSize = 28.sp),
                         color = MaterialTheme.colorScheme.secondary
                     )
-                    Box(
+                    Text(
+                        text = "\"${uiState.quote.content}\"",
+                        style = MaterialTheme.typography.titleMedium.copy(fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 26.sp),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                         modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "\"${uiState.quote.content}\"",
-                            style = MaterialTheme.typography.titleMedium.copy(fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 26.sp),
-                            color = MaterialTheme.colorScheme.onBackground,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            maxLines = 3,
-                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-                    }
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 8.dp)
+                    )
                     Text(
                         text = "— ${uiState.quote.author}",
                         style = MaterialTheme.typography.labelMedium,
