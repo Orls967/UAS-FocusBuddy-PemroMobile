@@ -100,6 +100,11 @@ class TaskListViewModel : ViewModel() {
 
     fun onSearchChange(query: String) { _searchQuery.value = query }
     fun onFilterChange(filter: String) { _selectedFilter.value = filter }
+
+    fun startFocus(task: Task, onNavigate: () -> Unit) = viewModelScope.launch {
+        AppModule.userPreferences.saveActiveTask(task.id, task.title)
+        onNavigate()
+    }
 }
 
 class TaskListViewModelFactory : ViewModelProvider.Factory {

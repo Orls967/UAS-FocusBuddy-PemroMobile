@@ -10,8 +10,6 @@ import kotlinx.coroutines.launch
 
 data class ProfileUiState(
     val user: User? = null,
-    val pomodoroMinutes: Int = 25,
-    val breakMinutes: Int = 5,
     val notificationsEnabled: Boolean = true,
     val totalFocusMinutes: Int = 0,
     val isLoading: Boolean = true,
@@ -22,8 +20,6 @@ data class ProfileUiState(
 )
 
 private data class ProfilePrefsData(
-    val pomodoro: Int,
-    val breakMin: Int,
     val notif: Boolean,
     val dark: Boolean
 )
@@ -32,7 +28,7 @@ class ProfileViewModel : ViewModel() {
     private val logoutUseCase = AppModule.logoutUseCase
     private val userPreferences = AppModule.userPreferences
     private val authRepository = AppModule.authRepository
-    private val focusSessionRepository = AppModule.focusSessionRepository
+    private val taskRepository = AppModule.taskRepository
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
@@ -41,23 +37,21 @@ class ProfileViewModel : ViewModel() {
 
     private fun loadProfile() = viewModelScope.launch {
         val prefsFlow = combine(
-            userPreferences.pomodoroMinutes,
-            userPreferences.breakMinutes,
             userPreferences.notificationsEnabled,
             userPreferences.isDarkMode
-        ) { pomodoro, breakMin, notif, dark ->
-            ProfilePrefsData(pomodoro, breakMin, notif, dark)
+        ) { notif, dark ->
+            ProfilePrefsData(notif, dark)
         }
 
         val baseFlow = combine(
             authRepository.getCurrentUser(),
             prefsFlow,
-            focusSessionRepository.getTodayFocusMinutes()
+            taskRepository.getAllTasks().map { tasks ->
+                tasks.filter { it.isCompleted }.sumOf { it.focusDuration }
+            }
         ) { user, prefs, focusMin ->
             ProfileUiState(
                 user = user,
-                pomodoroMinutes = prefs.pomodoro,
-                breakMinutes = prefs.breakMin,
                 notificationsEnabled = prefs.notif,
                 isDarkMode = prefs.dark,
                 totalFocusMinutes = focusMin,
@@ -68,26 +62,6 @@ class ProfileViewModel : ViewModel() {
         combine(baseFlow, userPreferences.profilePhotoUri) { state, photoUri ->
             state.copy(profilePhotoUri = photoUri)
         }.collect { _uiState.value = it }
-    }
-
-    fun setPomodoroMinutes(minutes: Int) = viewModelScope.launch {
-        val breakMin = when (minutes) {
-            15 -> 3
-            20 -> 4
-            25 -> 5
-            30 -> 6
-            35 -> 7
-            40 -> 8
-            45 -> 9
-            50 -> 10
-            55 -> 11
-            60 -> 12
-            65 -> 13
-            70 -> 14
-            75 -> 15
-            else -> minutes / 5
-        }
-        userPreferences.saveFocusSettings(minutes, breakMin)
     }
 
     fun setNotificationsEnabled(enabled: Boolean) = viewModelScope.launch {

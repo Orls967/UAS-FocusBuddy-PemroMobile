@@ -25,7 +25,8 @@ import androidx.compose.ui.draw.clip
 fun TaskListScreen(
     viewModel: TaskListViewModel,
     onNavigateToTask: (Int) -> Unit,
-    onNavigateToAddTask: () -> Unit
+    onNavigateToAddTask: () -> Unit,
+    onNavigateToTimer: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val filters = listOf("ALL", "HIGH", "MEDIUM", "LOW")
@@ -155,7 +156,8 @@ fun TaskListScreen(
                             TaskCard(
                                 task = task,
                                 onCheckedChange = {},
-                                onClick = { onNavigateToTask(task.id) }
+                                onClick = { onNavigateToTask(task.id) },
+                                onStartFocus = { viewModel.startFocus(task, onNavigateToTimer) }
                             )
                         }
                     }

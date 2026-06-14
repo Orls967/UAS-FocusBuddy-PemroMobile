@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -40,12 +41,15 @@ import com.example.focusbuddyapp.presentation.task.list.TaskListScreen
 import com.example.focusbuddyapp.presentation.task.list.TaskListViewModel
 import com.example.focusbuddyapp.presentation.task.list.TaskListViewModelFactory
 import com.example.focusbuddyapp.ui.components.FocusBuddyBottomNav
+import com.example.focusbuddyapp.di.AppModule
 
 @Composable
 fun NavGraph() {
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
+    
+    val isFocusLocked by AppModule.userPreferences.isFocusLocked.collectAsState(initial = false)
 
     val showBottomNav = currentRoute in bottomNavRoutes
 
@@ -54,7 +58,8 @@ fun NavGraph() {
             if (showBottomNav) {
                 FocusBuddyBottomNav(
                     navController = navController,
-                    currentRoute = currentRoute
+                    currentRoute = currentRoute,
+                    isFocusLocked = isFocusLocked
                 )
             }
         }
@@ -131,13 +136,17 @@ fun NavGraph() {
                 TaskListScreen(
                     viewModel = vm,
                     onNavigateToTask = { taskId -> navController.navigate(Screen.TaskDetail.createRoute(taskId)) },
-                    onNavigateToAddTask = { navController.navigate(Screen.AddEditTask.createRoute()) }
+                    onNavigateToAddTask = { navController.navigate(Screen.AddEditTask.createRoute()) },
+                    onNavigateToTimer = { navController.navigate(Screen.FocusTimer.route) }
                 )
             }
 
             composable(Screen.FocusTimer.route) {
                 val vm: FocusViewModel = viewModel(factory = FocusViewModelFactory())
-                FocusScreen(viewModel = vm)
+                FocusScreen(
+                    viewModel = vm,
+                    onNavigateToTaskList = { navController.navigate(Screen.TaskList.route) }
+                )
             }
 
             composable(Screen.Progress.route) {

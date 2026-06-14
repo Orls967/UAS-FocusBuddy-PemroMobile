@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.focusbuddyapp.di.AppModule
 import com.example.focusbuddyapp.domain.model.Priority
+import com.example.focusbuddyapp.domain.model.Difficulty
 import com.example.focusbuddyapp.domain.model.Task
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,8 +19,9 @@ data class AddEditTaskUiState(
     val description: String = "",
     val category: String = "Academic Focus",
     val priority: Priority = Priority.MEDIUM,
+    val difficulty: Difficulty = Difficulty.MEDIUM,
     val dueDate: Long? = null,
-    val studyNotes: String = "",
+    val focusDuration: Int = 25,
     val isLoading: Boolean = false,
     val isEditMode: Boolean = false,
     val isSaved: Boolean = false,
@@ -48,8 +50,9 @@ class AddEditTaskViewModel(private val taskId: Int?) : ViewModel() {
                     description = task.description,
                     category = task.category,
                     priority = task.priority,
+                    difficulty = task.difficulty,
                     dueDate = task.dueDate,
-                    studyNotes = task.studyNotes,
+                    focusDuration = task.focusDuration,
                     isEditMode = true,
                     isLoading = false
                 )
@@ -63,8 +66,18 @@ class AddEditTaskViewModel(private val taskId: Int?) : ViewModel() {
     fun onDescriptionChange(v: String) = _uiState.update { it.copy(description = v) }
     fun onCategoryChange(v: String) = _uiState.update { it.copy(category = v) }
     fun onPriorityChange(v: Priority) = _uiState.update { it.copy(priority = v) }
+    
+    fun onDifficultyChange(v: Difficulty) = _uiState.update { 
+        val recommendedDuration = when(v) {
+            Difficulty.LOW -> 15
+            Difficulty.MEDIUM -> 30
+            Difficulty.HIGH -> 75
+        }
+        it.copy(difficulty = v, focusDuration = recommendedDuration) 
+    }
+
     fun onDueDateChange(v: Long?) = _uiState.update { it.copy(dueDate = v) }
-    fun onStudyNotesChange(v: String) = _uiState.update { it.copy(studyNotes = v) }
+    fun onFocusDurationChange(v: Int) = _uiState.update { it.copy(focusDuration = v) }
 
     fun save() = viewModelScope.launch {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
@@ -82,8 +95,10 @@ class AddEditTaskViewModel(private val taskId: Int?) : ViewModel() {
                 description = state.description,
                 category = state.category,
                 priority = state.priority,
+                difficulty = state.difficulty,
                 dueDate = state.dueDate,
-                studyNotes = state.studyNotes
+                studyNotes = "",
+                focusDuration = state.focusDuration
             )
             val result = if (state.isEditMode) editTaskUseCase(task) else addTaskUseCase(task).map { Unit }
             result.fold(

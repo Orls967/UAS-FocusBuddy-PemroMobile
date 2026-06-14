@@ -60,7 +60,10 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun toggleTaskComplete(id: Int, isCompleted: Boolean) =
-        withContext(Dispatchers.IO) { taskDao.toggleTaskComplete(id, isCompleted) }
+        withContext(Dispatchers.IO) {
+            val completedAt = if (isCompleted) System.currentTimeMillis() else null
+            taskDao.toggleTaskComplete(id, isCompleted, completedAt)
+        }
 
     override fun searchTasks(query: String): Flow<List<Task>> =
         taskDao.searchTasks(query).map { it.map { e -> e.toDomain() } }
@@ -97,6 +100,7 @@ class TaskRepositoryImpl(
             val request = TaskCreateRequestDto(
                 title = task.title, description = task.description,
                 category = task.category, priority = task.priority.name,
+                difficulty = task.difficulty.name,
                 dueDate = task.dueDate, dueTime = task.dueTime, studyNotes = task.studyNotes
             )
             val response = if (task.remoteId != null) {

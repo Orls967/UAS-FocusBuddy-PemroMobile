@@ -35,7 +35,43 @@ class DashboardViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
-    init { loadDashboard() }
+    init { 
+        loadDashboard() 
+        viewModelScope.launch {
+            AppModule.taskRepository.getAllTasks().collect { tasks ->
+                android.util.Log.d("DEBUG_DATASET", "=== START DEBUG DATASET ===")
+                var totalFocusMinutes = 0
+                val (startOfToday, endOfToday) = getTodayBounds()
+                val (startOfWeek, endOfWeek) = getWeekBounds()
+
+                var todayFocusMinutes = 0
+                var currentWeekFocusMinutes = 0
+                var totalCompletedTasks = 0
+
+                tasks.forEach { task ->
+                    if (task.isCompleted) {
+                        android.util.Log.d("DEBUG_DATASET", "Task: ${task.title} | isCompleted: ${task.isCompleted} | focusDuration: ${task.focusDuration} | completedAt: ${task.completedAt}")
+                        totalCompletedTasks++
+                        totalFocusMinutes += task.focusDuration
+                        if (task.completedAt != null) {
+                            if (task.completedAt >= startOfToday && task.completedAt < endOfToday) {
+                                todayFocusMinutes += task.focusDuration
+                            }
+                            if (task.completedAt >= startOfWeek && task.completedAt < endOfWeek) {
+                                currentWeekFocusMinutes += task.focusDuration
+                            }
+                        }
+                    }
+                }
+                android.util.Log.d("DEBUG_DATASET", "TOTAL_COMPLETED_TASKS: $totalCompletedTasks")
+                android.util.Log.d("DEBUG_DATASET", "TOTAL_FOCUS_MINUTES: $totalFocusMinutes")
+                android.util.Log.d("DEBUG_DATASET", "TOTAL_FOCUS_HOURS: ${totalFocusMinutes / 60}")
+                android.util.Log.d("DEBUG_DATASET", "TODAY_FOCUS_MINUTES: $todayFocusMinutes")
+                android.util.Log.d("DEBUG_DATASET", "CURRENT_WEEK_FOCUS_MINUTES: $currentWeekFocusMinutes")
+                android.util.Log.d("DEBUG_DATASET", "=== END DEBUG DATASET ===")
+            }
+        }
+    }
 
     private fun getTodayBounds(): Pair<Long, Long> {
         val cal = Calendar.getInstance()
@@ -89,16 +125,27 @@ class DashboardViewModel : ViewModel() {
                 val (startOfWeek, endOfWeek) = getWeekBounds()
 
                 val completedToday = tasks.count {
-                    it.isCompleted && it.dueDate != null && it.dueDate >= startOfToday && it.dueDate < endOfToday
+                    it.isCompleted && it.completedAt != null && it.completedAt >= startOfToday && it.completedAt < endOfToday
                 }
                 val completedThisWeek = tasks.count {
-                    it.isCompleted && it.dueDate != null && it.dueDate >= startOfWeek && it.dueDate < endOfWeek
+                    it.isCompleted && it.completedAt != null && it.completedAt >= startOfWeek && it.completedAt < endOfWeek
                 }
 
                 // Filter tasks that are due today
-                val todayTasks = tasks.filter { task ->
+                var todayTasks = tasks.filter { task ->
                     task.dueDate != null && task.dueDate >= startOfToday && task.dueDate < endOfToday
                 }.take(4)
+
+                if (todayTasks.isEmpty()) {
+                    // Fallback to top active (uncompleted) tasks, ordered deterministically
+                    todayTasks = tasks.filter { !it.isCompleted }
+                        .sortedWith(
+                            compareBy<Task> { it.dueDate == null }
+                                .thenBy { it.dueDate ?: Long.MAX_VALUE }
+                                .thenBy { it.priority.ordinal }
+                        )
+                        .take(4)
+                }
 
                 _uiState.update {
                     it.copy(

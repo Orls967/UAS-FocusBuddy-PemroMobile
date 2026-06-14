@@ -773,42 +773,19 @@ fun ProfileScreen(viewModel: ProfileViewModel, onLogout: () -> Unit) {
             // Stats
             Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                 Row(Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    ProfileStat("Focus Time", "${uiState.totalFocusMinutes / 60}h ${uiState.totalFocusMinutes % 60}m")
+                    ProfileStat("Focus Time", "${uiState.totalFocusMinutes / 60}h")
                     Divider(modifier = Modifier.width(1.dp).height(40.dp), color = MaterialTheme.colorScheme.outline)
                     ProfileStat("Consistency", "87%")
-                    Divider(modifier = Modifier.width(1.dp).height(40.dp), color = MaterialTheme.colorScheme.outline)
-                    ProfileStat("Top Rank", "TOP 5")
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // Focus settings
-            Text("Focus Settings", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.SemiBold)
+            // App settings
+            Text("App Settings", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(8.dp))
             Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                 Column(Modifier.padding(16.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Focus Duration", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
-                        Text("${uiState.pomodoroMinutes} min", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                    }
-                    Slider(
-                        value = uiState.pomodoroMinutes.toFloat(),
-                        onValueChange = { viewModel.setPomodoroMinutes(it.toInt()) },
-                        valueRange = 15f..75f,
-                        steps = 11,
-                        colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary, inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant)
-                    )
-
-                    Divider(Modifier.padding(vertical = 8.dp))
-
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Estimated Break", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
-                        Text("${uiState.breakMinutes} min", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                    }
-
-                    Divider(Modifier.padding(vertical = 8.dp))
-
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text("Notifications", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
                         Switch(

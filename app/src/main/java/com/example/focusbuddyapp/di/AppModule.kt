@@ -124,6 +124,6 @@ object AppModule {
 
     val startFocusSessionUseCase by lazy { StartFocusSessionUseCase(focusSessionRepository) }
     val stopFocusSessionUseCase by lazy { StopFocusSessionUseCase(focusSessionRepository) }
-    val getTodayFocusSummaryUseCase by lazy { GetTodayFocusSummaryUseCase(focusSessionRepository) }
-    val getWeeklyFocusDataUseCase by lazy { GetWeeklyFocusDataUseCase(focusSessionRepository) }
+    val getTodayFocusSummaryUseCase by lazy { GetTodayFocusSummaryUseCase(taskRepository) }
+    val getWeeklyFocusDataUseCase by lazy { GetWeeklyFocusDataUseCase(taskRepository) }
 }

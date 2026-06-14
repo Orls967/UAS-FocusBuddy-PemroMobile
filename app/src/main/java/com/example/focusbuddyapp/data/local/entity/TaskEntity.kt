@@ -28,6 +28,7 @@ data class TaskEntity(
     @ColumnInfo(name = "description") val description: String = "",
     @ColumnInfo(name = "category") val category: String = "Academic Focus",
     @ColumnInfo(name = "priority") val priority: String = "MEDIUM",   // "HIGH"|"MEDIUM"|"LOW"
+    @ColumnInfo(name = "difficulty") val difficulty: String = "MEDIUM", // "HIGH"|"MEDIUM"|"LOW"
     @ColumnInfo(name = "due_date") val dueDate: Long? = null,
     @ColumnInfo(name = "due_time") val dueTime: String? = null,
     @ColumnInfo(name = "is_completed") val isCompleted: Boolean = false,
@@ -35,5 +36,7 @@ data class TaskEntity(
     @ColumnInfo(name = "study_notes") val studyNotes: String = "",
     @ColumnInfo(name = "remote_id") val remoteId: String? = null,
     @ColumnInfo(name = "synced_at") val syncedAt: Long? = null,
-    @ColumnInfo(name = "user_id") val userId: Int = 0
+    @ColumnInfo(name = "user_id") val userId: Int = 0,
+    @ColumnInfo(name = "completed_at") val completedAt: Long? = null,
+    @ColumnInfo(name = "focus_duration") val focusDuration: Int = 25
 )

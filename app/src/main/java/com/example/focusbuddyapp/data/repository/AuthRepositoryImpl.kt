@@ -76,6 +76,7 @@ class AuthRepositoryImpl(
                 description = "Membaca kembali modul perkuliahan bab 1-8",
                 category = "Kuliah",
                 priority = "HIGH",
+                difficulty = "HIGH",
                 userId = userId,
                 isCompleted = false
             ),
@@ -84,6 +85,7 @@ class AuthRepositoryImpl(
                 description = "Menyiapkan slide dan materi presentasi FocusBuddy",
                 category = "Presentasi",
                 priority = "HIGH",
+                difficulty = "MEDIUM",
                 userId = userId,
                 isCompleted = false
             ),
@@ -92,19 +94,24 @@ class AuthRepositoryImpl(
                 description = "Menyusun laporan akhir dan readme file GitHub",
                 category = "Laporan",
                 priority = "MEDIUM",
+                difficulty = "MEDIUM",
                 userId = userId,
                 isCompleted = false
             )
         )
 
+        val nowForSeeding = System.currentTimeMillis()
         val completedTodayTasks = listOf(
             com.example.focusbuddyapp.data.local.entity.TaskEntity(
                 title = "Implementasi Dark Mode",
                 description = "Menerapkan visual contrast di seluruh halaman",
                 category = "Coding",
                 priority = "HIGH",
+                difficulty = "HIGH",
                 userId = userId,
-                isCompleted = true
+                isCompleted = true,
+                focusDuration = 30,
+                completedAt = nowForSeeding
             ),
             com.example.focusbuddyapp.data.local.entity.TaskEntity(
                 title = "Refactor Repository Layer",
@@ -112,15 +119,20 @@ class AuthRepositoryImpl(
                 category = "Coding",
                 priority = "HIGH",
                 userId = userId,
-                isCompleted = true
+                isCompleted = true,
+                focusDuration = 75,
+                completedAt = nowForSeeding
             ),
             com.example.focusbuddyapp.data.local.entity.TaskEntity(
                 title = "Testing Notification Feature",
                 description = "Menguji local notification ketika timer selesai",
                 category = "Testing",
                 priority = "MEDIUM",
+                difficulty = "LOW",
                 userId = userId,
-                isCompleted = true
+                isCompleted = true,
+                focusDuration = 15,
+                completedAt = nowForSeeding
             ),
             com.example.focusbuddyapp.data.local.entity.TaskEntity(
                 title = "Perbaikan Profile UI",
@@ -128,50 +140,71 @@ class AuthRepositoryImpl(
                 category = "UI/UX",
                 priority = "MEDIUM",
                 userId = userId,
-                isCompleted = true
+                isCompleted = true,
+                focusDuration = 60,
+                completedAt = nowForSeeding
             )
         )
 
+        val cal = java.util.Calendar.getInstance()
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 12)
+        val dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK)
+        val offset = when (dayOfWeek) {
+            java.util.Calendar.SUNDAY -> -6
+            java.util.Calendar.MONDAY -> 0
+            java.util.Calendar.TUESDAY -> -1
+            java.util.Calendar.WEDNESDAY -> -2
+            java.util.Calendar.THURSDAY -> -3
+            java.util.Calendar.FRIDAY -> -4
+            java.util.Calendar.SATURDAY -> -5
+            else -> 0
+        }
+        cal.add(java.util.Calendar.DAY_OF_MONTH, offset)
+        val startOfWeek = cal.timeInMillis
+        val oneDay = 24 * 60 * 60 * 1000L
+
         val historicalTasks = listOf(
             com.example.focusbuddyapp.data.local.entity.TaskEntity(
-                title = "Analisis Kebutuhan Pengguna",
+                title = "Analisis Kebutuhan",
                 description = "Melakukan wawancara singkat untuk fitur FocusBuddy",
-                category = "Riset",
-                priority = "LOW",
-                userId = userId,
-                isCompleted = true
+                category = "Riset", priority = "LOW", difficulty = "LOW", userId = userId,
+                isCompleted = true, focusDuration = 60, completedAt = startOfWeek + 0 * oneDay
             ),
             com.example.focusbuddyapp.data.local.entity.TaskEntity(
-                title = "Perancangan Arsitektur MVVM",
+                title = "Perancangan Arsitektur",
                 description = "Membuat diagram navigasi dan struktur package",
-                category = "Desain",
-                priority = "MEDIUM",
-                userId = userId,
-                isCompleted = true
+                category = "Desain", priority = "MEDIUM", difficulty = "MEDIUM", userId = userId,
+                isCompleted = true, focusDuration = 120, completedAt = startOfWeek + 1 * oneDay
             ),
             com.example.focusbuddyapp.data.local.entity.TaskEntity(
                 title = "Pembuatan Unit Testing",
                 description = "Menulis unit test untuk use case dan viewmodel",
-                category = "Testing",
-                priority = "HIGH",
-                userId = userId,
-                isCompleted = true
+                category = "Testing", priority = "HIGH", difficulty = "HIGH", userId = userId,
+                isCompleted = true, focusDuration = 45, completedAt = startOfWeek + 2 * oneDay
             ),
             com.example.focusbuddyapp.data.local.entity.TaskEntity(
-                title = "Integrasi Room Database",
+                title = "Integrasi Database",
                 description = "Membuat entity, dao, dan konfigurasi database",
-                category = "Coding",
-                priority = "HIGH",
-                userId = userId,
-                isCompleted = true
+                category = "Coding", priority = "HIGH", userId = userId,
+                isCompleted = true, focusDuration = 180, completedAt = startOfWeek + 3 * oneDay
             ),
             com.example.focusbuddyapp.data.local.entity.TaskEntity(
-                title = "Desain Wireframe & Mockup",
+                title = "Desain Wireframe",
                 description = "Mendesain UI Figma untuk halaman utama dan detail",
-                category = "UI/UX",
-                priority = "MEDIUM",
-                userId = userId,
-                isCompleted = true
+                category = "UI/UX", priority = "MEDIUM", userId = userId,
+                isCompleted = true, focusDuration = 90, completedAt = startOfWeek + 4 * oneDay
+            ),
+            com.example.focusbuddyapp.data.local.entity.TaskEntity(
+                title = "Review Kode",
+                description = "Code review untuk sprint pertama",
+                category = "Coding", priority = "LOW", userId = userId,
+                isCompleted = true, focusDuration = 0, completedAt = startOfWeek + 5 * oneDay
+            ),
+            com.example.focusbuddyapp.data.local.entity.TaskEntity(
+                title = "Persiapan Rilis",
+                description = "Build APK dan testing performa",
+                category = "Manajemen", priority = "HIGH", userId = userId,
+                isCompleted = true, focusDuration = 300, completedAt = startOfWeek + 6 * oneDay
             )
         )
 
@@ -180,7 +213,6 @@ class AuthRepositoryImpl(
         val historicalIds = historicalTasks.map { taskDao.insertTask(it).toInt() }
 
         val now = System.currentTimeMillis()
-        val oneDay = 24 * 60 * 60 * 1000L
 
         val sessions = listOf(
             // Hari Ini (Today) - 4 sessions
@@ -279,8 +311,8 @@ class AuthRepositoryImpl(
             focusSessionDao.insertSession(it)
         }
 
-        completedTodayIds.forEach { taskDao.toggleTaskComplete(it, true) }
-        historicalIds.forEach { taskDao.toggleTaskComplete(it, true) }
+        completedTodayIds.forEach { taskDao.toggleTaskComplete(it, true, System.currentTimeMillis()) }
+        historicalIds.forEach { taskDao.toggleTaskComplete(it, true, System.currentTimeMillis() - 2 * 24 * 60 * 60 * 1000L) }
     }
 
     override suspend fun login(email: String, password: String): Result<User> =

@@ -23,7 +23,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
 
 @Composable
-fun FocusScreen(viewModel: FocusViewModel) {
+fun FocusScreen(
+    viewModel: FocusViewModel,
+    onNavigateToTaskList: () -> Unit = {}
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     if (uiState.showNextTaskModal) {
@@ -91,6 +94,24 @@ fun FocusScreen(viewModel: FocusViewModel) {
         )
     }
 
+    if (uiState.showCompleteTaskDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissCompleteTaskDialog() },
+            title = { Text("Task Completed", style = MaterialTheme.typography.titleLarge) },
+            text = { Text("Are you sure \"${uiState.currentTaskTitle}\" is finished?", style = MaterialTheme.typography.bodyMedium) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.completeTask() }) {
+                    Text("Complete", color = MaterialTheme.colorScheme.primary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.dismissCompleteTaskDialog() }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(containerColor = MaterialTheme.colorScheme.background) { paddingValues ->
         Column(
             modifier = Modifier
@@ -146,42 +167,73 @@ fun FocusScreen(viewModel: FocusViewModel) {
 
             Spacer(Modifier.height(24.dp))
 
-            // Control buttons
-            Button(
-                onClick = viewModel::startTimer,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                enabled = uiState.timerState != TimerState.RUNNING,
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(Icons.Filled.PlayArrow, null, tint = Color.White)
-                Spacer(Modifier.width(8.dp))
-                Text("Start Focus", style = MaterialTheme.typography.titleMedium, color = Color.White)
-            }
-
-            Spacer(Modifier.height(10.dp))
-
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedButton(
-                    onClick = viewModel::pauseTimer,
-                    modifier = Modifier.weight(1f).height(48.dp),
-                    enabled = uiState.timerState == TimerState.RUNNING,
+            if (!uiState.hasActiveTask) {
+                Spacer(Modifier.height(40.dp))
+                Icon(Icons.Filled.Assignment, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(16.dp))
+                Text("No Active Task Selected", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+                Spacer(Modifier.height(8.dp))
+                Text("Create or select a task before starting a focus session.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                Spacer(Modifier.height(24.dp))
+                Button(
+                    onClick = onNavigateToTaskList,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Filled.Pause, null)
-                    Spacer(Modifier.width(4.dp))
-                    Text("Pause")
+                    Text("Go To Tasks", color = Color.White)
                 }
+            } else {
+                // Control buttons
                 Button(
-                    onClick = { viewModel.stopTimer() },
-                    modifier = Modifier.weight(1f).height(48.dp),
-                    enabled = uiState.timerState != TimerState.IDLE,
+                    onClick = viewModel::startTimer,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    enabled = uiState.timerState != TimerState.RUNNING,
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Icon(Icons.Filled.Stop, null, tint = Color.White)
-                    Spacer(Modifier.width(4.dp))
-                    Text("Stop", color = Color.White)
+                    Icon(Icons.Filled.PlayArrow, null, tint = Color.White)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Start Focus", style = MaterialTheme.typography.titleMedium, color = Color.White)
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedButton(
+                        onClick = viewModel::pauseTimer,
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        enabled = uiState.timerState == TimerState.RUNNING,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Filled.Pause, null)
+                        Spacer(Modifier.width(4.dp))
+                        Text("Pause")
+                    }
+                    Button(
+                        onClick = { viewModel.stopTimer() },
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        enabled = uiState.timerState != TimerState.IDLE,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Icon(Icons.Filled.Stop, null, tint = Color.White)
+                        Spacer(Modifier.width(4.dp))
+                        Text("Stop", color = Color.White)
+                    }
+                }
+                
+                Spacer(Modifier.height(10.dp))
+                
+                Button(
+                    onClick = { viewModel.showCompleteTaskDialog() },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    enabled = uiState.timerState != TimerState.IDLE && !uiState.isBreakMode,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
+                ) {
+                    Icon(Icons.Filled.Check, null, tint = Color.White)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Complete Task", color = Color.White)
                 }
             }
 
@@ -202,20 +254,12 @@ fun FocusScreen(viewModel: FocusViewModel) {
             Spacer(Modifier.height(24.dp))
 
             // Today stats
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                StatBox(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Filled.LocalFireDepartment,
-                    value = "${uiState.todayFocusMinutes / 60}h ${uiState.todayFocusMinutes % 60}m",
-                    label = "Today's Focus"
-                )
-                StatBox(
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.Filled.MilitaryTech,
-                    value = "${uiState.efficiencyPercent}%",
-                    label = "Efficiency"
-                )
-            }
+            StatBox(
+                modifier = Modifier.fillMaxWidth(),
+                icon = Icons.Filled.LocalFireDepartment,
+                value = "${uiState.todayFocusMinutes / 60}h ${uiState.todayFocusMinutes % 60}m",
+                label = "Today's Focus"
+            )
         }
     }
 }

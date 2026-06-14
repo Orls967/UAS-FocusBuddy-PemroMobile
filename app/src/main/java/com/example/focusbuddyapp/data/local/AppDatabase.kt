@@ -20,7 +20,7 @@ import com.example.focusbuddyapp.data.local.entity.UserEntity
         SubTaskEntity::class,
         FocusSessionEntity::class
     ],
-    version = 3,
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -40,6 +40,11 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "focusbuddy.db"
                 )
+                    // NOTE: fallbackToDestructiveMigration() is intentionally used here for local development,
+                    // prototyping, and UAS academic demo purposes to dynamically apply schema changes (such
+                    // as adding completed_at or focus_duration columns) without complex migration scripts.
+                    // For a production release, this must be replaced with proper Migration objects
+                    // (e.g. Migration(3, 4)) to prevent data loss when updating user databases.
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { INSTANCE = it }

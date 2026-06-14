@@ -22,7 +22,6 @@ data class ProgressUiState(
 class ProgressViewModel : ViewModel() {
     private val getWeeklyFocusUseCase = AppModule.getWeeklyFocusDataUseCase
     private val taskRepository = AppModule.taskRepository
-    private val focusSessionRepository = AppModule.focusSessionRepository
 
     private val _uiState = MutableStateFlow(ProgressUiState())
     val uiState: StateFlow<ProgressUiState> = _uiState.asStateFlow()
@@ -32,24 +31,22 @@ class ProgressViewModel : ViewModel() {
     private fun loadProgress() = viewModelScope.launch {
         combine(
             getWeeklyFocusUseCase(),
-            taskRepository.getAllTasks(),
-            focusSessionRepository.getAllSessions()
-        ) { weeklyData, tasks, sessions ->
-            val total = weeklyData.values.sum()
+            taskRepository.getAllTasks()
+        ) { weeklyData, tasks ->
+            val totalAllTime = tasks.filter { it.isCompleted }.sumOf { it.focusDuration }
             val bestDay = weeklyData.maxByOrNull { it.value }?.key ?: "—"
             val daysWithFocus = weeklyData.values.count { it > 0 }
             val consistency = if (weeklyData.isNotEmpty()) (daysWithFocus * 100 / 7) else 0
             val completedCount = tasks.count { it.isCompleted }
-            val sessionCount = sessions.count { it.endTime != null }
 
             ProgressUiState(
                 weeklyData = weeklyData,
-                totalFocusMinutes = total,
+                totalFocusMinutes = totalAllTime,
                 bestDay = bestDay,
                 consistencyPercent = consistency,
-                deepWorkHours = total / 60f,
+                deepWorkHours = totalAllTime / 60f,
                 completedTaskCount = completedCount,
-                focusSessionsCount = sessionCount,
+                focusSessionsCount = completedCount, // map to completed tasks
                 isLoading = false
             )
         }.collect { state ->

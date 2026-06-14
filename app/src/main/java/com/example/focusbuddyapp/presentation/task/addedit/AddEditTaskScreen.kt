@@ -13,7 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.focusbuddyapp.domain.model.Priority
+import com.example.focusbuddyapp.domain.model.Difficulty
 import com.example.focusbuddyapp.ui.theme.*
+import androidx.compose.ui.text.font.FontWeight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,6 +71,23 @@ fun AddEditTaskScreen(
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text("e.g., Advanced Microeconomics Research", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
+                        )
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // Task Description
+                    Text("Description", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
+                    Spacer(Modifier.height(6.dp))
+                    OutlinedTextField(
+                        value = uiState.description,
+                        onValueChange = viewModel::onDescriptionChange,
+                        modifier = Modifier.fillMaxWidth().height(100.dp),
+                        placeholder = { Text("Enter task details...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary, unfocusedBorderColor = MaterialTheme.colorScheme.outline,
@@ -140,20 +159,65 @@ fun AddEditTaskScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    // Study Notes
-                    Text("Study Notes", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
-                    Spacer(Modifier.height(6.dp))
-                    OutlinedTextField(
-                        value = uiState.studyNotes,
-                        onValueChange = viewModel::onStudyNotesChange,
-                        modifier = Modifier.fillMaxWidth().height(120.dp),
-                        placeholder = { Text("List specific resources or sub-tasks here...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary, unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f), unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
-                        )
+                    // Difficulty
+                    Text("Difficulty Level", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Difficulty.values().forEach { difficulty ->
+                            val selected = uiState.difficulty == difficulty
+                            val isDark = MaterialTheme.colorScheme.primary == DarkPrimary
+                            val selectedBg = when (difficulty) {
+                                Difficulty.HIGH   -> if (isDark) Color(0xFF4A1F1F) else PriorityHighBg
+                                Difficulty.MEDIUM -> if (isDark) Color(0xFF383530) else PriorityMedBg
+                                Difficulty.LOW    -> if (isDark) Color(0xFF1C2D42) else PriorityLowBg
+                            }
+                            val selectedFg = when (difficulty) {
+                                Difficulty.HIGH   -> if (isDark) Color(0xFFFFB4AB) else PriorityHighText
+                                Difficulty.MEDIUM -> if (isDark) Color(0xFFD3C5B5) else PriorityMedText
+                                Difficulty.LOW    -> if (isDark) Color(0xFFBAC8DB) else PriorityLowText
+                            }
+                            FilterChip(
+                                selected = selected,
+                                onClick = { viewModel.onDifficultyChange(difficulty) },
+                                label = { Text(difficulty.name, style = MaterialTheme.typography.labelMedium) },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = selectedBg,
+                                    selectedLabelColor = selectedFg,
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // Focus Duration
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text("Focus Duration", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
+                        Text("${uiState.focusDuration} min", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Slider(
+                        value = uiState.focusDuration.toFloat(),
+                        onValueChange = { viewModel.onFocusDurationChange(it.toInt()) },
+                        valueRange = 15f..120f,
+                        steps = 20, // 5-minute increments
+                        colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary, inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant)
                     )
+
+                    Spacer(Modifier.height(8.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text("Estimated Break", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
+                        val estimatedBreak = when {
+                            uiState.focusDuration >= 90 -> 20
+                            uiState.focusDuration >= 75 -> 15
+                            uiState.focusDuration >= 30 -> 10
+                            else -> 5
+                        }
+                        Text("$estimatedBreak min", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.SemiBold)
+                    }
+
                 }
             }
 

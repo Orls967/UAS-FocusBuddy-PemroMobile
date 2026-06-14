@@ -24,12 +24,13 @@ data class FocusUiState(
     val breakDurationMinutes: Int = 5,
     val currentTaskTitle: String = "No Active Task",
     val todayFocusMinutes: Int = 0,
-    val efficiencyPercent: Int = 85,
     val activeSessionId: Int? = null,
     val profilePhotoUri: String? = null,
     val isBreakMode: Boolean = false,
     val showBreakDialog: Boolean = false,
     val showNextTaskModal: Boolean = false,
+    val showCompleteTaskDialog: Boolean = false,
+    val hasActiveTask: Boolean = false,
     val activeTasks: List<Task> = emptyList()
 ) {
     val progress: Float get() = 1f - (remainingSeconds.toFloat() / totalSeconds)
@@ -68,11 +69,23 @@ class FocusViewModel : ViewModel() {
             }
         }
         viewModelScope.launch {
-            AppModule.userPreferences.pomodoroMinutes.collect { minutes ->
-                val breakMin = getBreakDurationForFocus(minutes)
+            AppModule.userPreferences.breakMinutes.collect { breakMin ->
                 _uiState.update { it.copy(breakDurationMinutes = breakMin) }
+            }
+        }
+        viewModelScope.launch {
+            AppModule.userPreferences.activeTaskId.collect { activeId ->
+                val hasTask = activeId != 0
+                val focusMin = if (hasTask) {
+                    AppModule.taskRepository.getTaskById(activeId)?.focusDuration ?: 25
+                } else {
+                    25
+                }
+                
+                _uiState.update { it.copy(hasActiveTask = hasTask) }
+                
                 if (_uiState.value.timerState == TimerState.IDLE) {
-                    val totalSecs = minutes * 60
+                    val totalSecs = focusMin * 60
                     _uiState.update {
                         it.copy(
                             totalSeconds = totalSecs,
@@ -120,6 +133,7 @@ class FocusViewModel : ViewModel() {
             val sessionId = startSessionUseCase(session)
             _uiState.update { it.copy(activeSessionId = sessionId.toInt()) }
         }
+        AppModule.userPreferences.saveFocusLocked(true)
         _uiState.update { it.copy(timerState = TimerState.RUNNING) }
         runTimer()
     }
@@ -131,14 +145,33 @@ class FocusViewModel : ViewModel() {
 
     fun stopTimer() = viewModelScope.launch {
         stopSessionAndReset(showDialogAfter = false)
+        AppModule.userPreferences.saveFocusLocked(false)
+    }
+
+    fun completeTask() = viewModelScope.launch {
+        val activeTaskId = AppModule.userPreferences.activeTaskId.first()
+        if (activeTaskId != 0) {
+            AppModule.toggleTaskCompleteUseCase(activeTaskId, true)
+            AppModule.userPreferences.clearActiveTask()
+        }
+        stopSessionAndReset(showDialogAfter = false)
+        AppModule.userPreferences.saveFocusLocked(false)
+        dismissCompleteTaskDialog()
+    }
+
+    fun showCompleteTaskDialog() {
+        _uiState.update { it.copy(showCompleteTaskDialog = true) }
+    }
+
+    fun dismissCompleteTaskDialog() {
+        _uiState.update { it.copy(showCompleteTaskDialog = false) }
     }
 
     fun startBreakAuto() = viewModelScope.launch {
         timerJob?.cancel()
         saveCompletedSession()
         
-        val pomodoroMinutes = AppModule.userPreferences.pomodoroMinutes.first()
-        val breakMin = getBreakDurationForFocus(pomodoroMinutes)
+        val breakMin = AppModule.userPreferences.breakMinutes.first()
         val totalSecs = breakMin * 60
         _uiState.update {
             it.copy(
@@ -163,8 +196,15 @@ class FocusViewModel : ViewModel() {
 
     private fun resetToIdle() = viewModelScope.launch {
         timerJob?.cancel()
-        val pomodoroMinutes = AppModule.userPreferences.pomodoroMinutes.first()
-        val totalSecs = pomodoroMinutes * 60
+        AppModule.userPreferences.saveFocusLocked(false)
+        val activeId = AppModule.userPreferences.activeTaskId.first()
+        val hasTask = activeId != 0
+        val focusMin = if (hasTask) {
+            AppModule.taskRepository.getTaskById(activeId)?.focusDuration ?: 25
+        } else {
+            25
+        }
+        val totalSecs = focusMin * 60
         _uiState.update {
             it.copy(
                 isBreakMode = false,
@@ -202,8 +242,14 @@ class FocusViewModel : ViewModel() {
                 stopSessionUseCase(session)
             }
         }
-        val pomodoroMinutes = AppModule.userPreferences.pomodoroMinutes.first()
-        val totalSecs = pomodoroMinutes * 60
+        val activeId = AppModule.userPreferences.activeTaskId.first()
+        val hasTask = activeId != 0
+        val focusMin = if (hasTask) {
+            AppModule.taskRepository.getTaskById(activeId)?.focusDuration ?: 25
+        } else {
+            25
+        }
+        val totalSecs = focusMin * 60
         _uiState.update {
             it.copy(
                 timerState = TimerState.IDLE,
@@ -226,11 +272,12 @@ class FocusViewModel : ViewModel() {
 
     fun selectNextTaskAndStopBreak(task: Task) = viewModelScope.launch {
         timerJob?.cancel()
+        AppModule.userPreferences.saveFocusLocked(false)
         
         AppModule.userPreferences.saveActiveTask(task.id, task.title)
         
-        val pomodoroMinutes = AppModule.userPreferences.pomodoroMinutes.first()
-        val totalSecs = pomodoroMinutes * 60
+        val focusMin = task.focusDuration
+        val totalSecs = focusMin * 60
         _uiState.update {
             it.copy(
                 isBreakMode = false,
@@ -239,7 +286,8 @@ class FocusViewModel : ViewModel() {
                 remainingSeconds = totalSecs,
                 timerState = TimerState.IDLE,
                 currentTaskTitle = task.title,
-                activeSessionId = null
+                activeSessionId = null,
+                hasActiveTask = true
             )
         }
     }

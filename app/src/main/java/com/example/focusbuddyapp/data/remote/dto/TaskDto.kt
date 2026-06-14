@@ -6,6 +6,7 @@ data class TaskDto(
     val description: String?,
     val category: String,
     val priority: String,      // "HIGH" | "MEDIUM" | "LOW"
+    val difficulty: String,    // "HIGH" | "MEDIUM" | "LOW"
     val dueDate: Long?,
     val dueTime: String?,
     val isCompleted: Boolean,
@@ -27,6 +28,7 @@ data class TaskCreateRequestDto(
     val description: String?,
     val category: String,
     val priority: String,
+    val difficulty: String,
     val dueDate: Long?,
     val dueTime: String?,
     val studyNotes: String?

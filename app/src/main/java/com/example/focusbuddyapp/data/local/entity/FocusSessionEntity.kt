@@ -24,7 +24,6 @@ data class FocusSessionEntity(
     @ColumnInfo(name = "duration_minutes") val durationMinutes: Int,
     @ColumnInfo(name = "start_time") val startTime: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "end_time") val endTime: Long? = null,
-    @ColumnInfo(name = "efficiency_percent") val efficiencyPercent: Int? = null,
     @ColumnInfo(name = "break_duration_minutes") val breakDurationMinutes: Int = 5,
     @ColumnInfo(name = "remote_id") val remoteId: String? = null,
     @ColumnInfo(name = "synced_at") val syncedAt: Long? = null

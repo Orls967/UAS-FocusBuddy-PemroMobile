@@ -46,6 +46,7 @@ class UserPreferences(private val context: Context) {
     val activeTaskTitle: Flow<String> = context.dataStore.data.map { it[ACTIVE_TASK_TITLE] ?: "" }
     val isDarkMode: Flow<Boolean> = context.dataStore.data.map { it[DARK_MODE] ?: false }
     val demoDataSeeded: Flow<Boolean> = context.dataStore.data.map { it[DEMO_DATA_SEEDED] ?: false }
+    val isFocusLocked: Flow<Boolean> = context.dataStore.data.map { it[booleanPreferencesKey("is_focus_locked")] ?: false }
 
     suspend fun saveAuthToken(token: String) {
         context.dataStore.edit { it[AUTH_TOKEN] = token }
@@ -73,6 +74,12 @@ class UserPreferences(private val context: Context) {
         context.dataStore.edit {
             it[POMODORO_MIN] = pomodoroMin
             it[BREAK_MIN]    = breakMin
+        }
+    }
+
+    suspend fun saveBreakMinutes(breakMin: Int) {
+        context.dataStore.edit {
+            it[BREAK_MIN] = breakMin
         }
     }
 
@@ -110,6 +117,10 @@ class UserPreferences(private val context: Context) {
 
     suspend fun setDemoDataSeeded(seeded: Boolean) {
         context.dataStore.edit { it[DEMO_DATA_SEEDED] = seeded }
+    }
+
+    suspend fun saveFocusLocked(locked: Boolean) {
+        context.dataStore.edit { it[booleanPreferencesKey("is_focus_locked")] = locked }
     }
 
     suspend fun clearAuthSession() {

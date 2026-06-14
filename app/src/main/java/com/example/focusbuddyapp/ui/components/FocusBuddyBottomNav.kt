@@ -20,7 +20,8 @@ import com.example.focusbuddyapp.ui.theme.SurfaceWhite
 @Composable
 fun FocusBuddyBottomNav(
     navController: NavController,
-    currentRoute: String?
+    currentRoute: String?,
+    isFocusLocked: Boolean = false
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -35,6 +36,7 @@ fun FocusBuddyBottomNav(
             NavigationBarItem(
                 selected = selected,
                 onClick = {
+                    if (isFocusLocked) return@NavigationBarItem
                     if (currentRoute != item.route) {
                         navController.navigate(item.route) {
                             popUpTo(navController.graph.startDestinationId) { saveState = true }

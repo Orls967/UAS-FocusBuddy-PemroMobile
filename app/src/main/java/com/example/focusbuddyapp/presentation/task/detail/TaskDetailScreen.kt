@@ -71,7 +71,12 @@ fun TaskDetailScreen(
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
             // Task header card
-            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
+            Card(
+                modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
                 Column(Modifier.padding(16.dp)) {
                     PriorityChip(priority = task.priority)
                     Spacer(Modifier.height(8.dp))
@@ -89,6 +94,30 @@ fun TaskDetailScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(task.category, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+                    Spacer(Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.TrendingUp, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Difficulty: ${task.difficulty.name}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Timer, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Focus Duration: ${task.focusDuration} min", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        val estimatedBreak = when {
+                            task.focusDuration >= 90 -> 20
+                            task.focusDuration >= 75 -> 15
+                            task.focusDuration >= 30 -> 10
+                            else -> 5
+                        }
+                        Icon(Icons.Filled.Coffee, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Estimated Break: $estimatedBreak min", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
 
@@ -96,7 +125,12 @@ fun TaskDetailScreen(
 
             // Description
             if (task.description.isNotBlank()) {
-                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(2.dp)
+                ) {
                     Column(Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.Description, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
@@ -112,22 +146,24 @@ fun TaskDetailScreen(
 
             // Progress card
             Card(
+                modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = PrimaryNavy),
                 elevation = CardDefaults.cardElevation(4.dp)
             ) {
-                Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${task.progressPercent}%", style = MaterialTheme.typography.headlineLarge, color = Color.White)
-                    Text("Project Momentum", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(0.7f))
-                    Spacer(Modifier.height(8.dp))
+                Column(Modifier.padding(24.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Text("${task.progressPercent}%", style = MaterialTheme.typography.displayMedium, color = Color.White)
+                    Text("Project Momentum", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(0.7f))
+                    Spacer(Modifier.height(24.dp))
                     OutlinedButton(
                         onClick = {
                             viewModel.startTimerForTask()
                             onNavigateToTimer()
                         },
+                        modifier = Modifier.height(52.dp).fillMaxWidth(0.85f),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
                         border = BorderStroke(1.dp, Color.White.copy(0.5f))
-                    ) { Text("Start Timer", color = Color.White) }
+                    ) { Text("Start Timer", color = Color.White, style = MaterialTheme.typography.titleMedium) }
                 }
             }
 

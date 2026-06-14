@@ -6,6 +6,7 @@ data class Task(
     val description: String = "",
     val category: String = "Academic Focus",
     val priority: Priority = Priority.MEDIUM,
+    val difficulty: Difficulty = Difficulty.MEDIUM,
     val dueDate: Long? = null,
     val dueTime: String? = null,        // "HH:mm"
     val isCompleted: Boolean = false,
@@ -14,7 +15,11 @@ data class Task(
     val remoteId: String? = null,       // server UUID for sync
     val syncedAt: Long? = null,
     val userId: Int = 0,
-    val subTasks: List<SubTask> = emptyList()
+    val subTasks: List<SubTask> = emptyList(),
+    val completedAt: Long? = null,
+    val focusDuration: Int = 25
 )
 
 enum class Priority { HIGH, MEDIUM, LOW }
+enum class Difficulty { HIGH, MEDIUM, LOW }
+

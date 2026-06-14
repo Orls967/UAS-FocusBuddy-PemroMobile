@@ -6,7 +6,6 @@ data class FocusSession(
     val durationMinutes: Int,
     val startTime: Long = System.currentTimeMillis(),
     val endTime: Long? = null,
-    val efficiencyPercent: Int? = null,
     val breakDurationMinutes: Int = 5,
     val remoteId: String? = null,
     val syncedAt: Long? = null

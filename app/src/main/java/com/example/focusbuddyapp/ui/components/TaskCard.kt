@@ -6,6 +6,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,6 +26,7 @@ fun TaskCard(
     task: Task,
     onCheckedChange: (Boolean) -> Unit,
     onClick: () -> Unit,
+    onStartFocus: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val borderColor by animateColorAsState(
@@ -73,7 +76,23 @@ fun TaskCard(
 
             Spacer(Modifier.width(8.dp))
 
-            PriorityChip(priority = task.priority)
+            Column(horizontalAlignment = Alignment.End) {
+                PriorityChip(priority = task.priority)
+                if (onStartFocus != null && !task.isCompleted) {
+                    Spacer(Modifier.height(8.dp))
+                    IconButton(
+                        onClick = onStartFocus,
+                        modifier = Modifier.size(32.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+                    ) {
+                        androidx.compose.material3.Icon(
+                            Icons.Filled.PlayArrow,
+                            contentDescription = "Start Focus",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

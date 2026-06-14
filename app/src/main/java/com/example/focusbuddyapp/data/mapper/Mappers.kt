@@ -17,10 +17,12 @@ fun UserEntity.toDomain() = User(
 fun TaskEntity.toDomain(subTasks: List<SubTask> = emptyList()) = Task(
     id = id, title = title, description = description, category = category,
     priority = Priority.valueOf(priority),
+    difficulty = Difficulty.valueOf(difficulty),
     dueDate = dueDate, dueTime = dueTime,
     isCompleted = isCompleted, progressPercent = progressPercent,
     studyNotes = studyNotes, remoteId = remoteId, syncedAt = syncedAt,
-    userId = userId, subTasks = subTasks
+    userId = userId, subTasks = subTasks,
+    completedAt = completedAt, focusDuration = focusDuration
 )
 
 fun SubTaskEntity.toDomain() = SubTask(
@@ -30,7 +32,7 @@ fun SubTaskEntity.toDomain() = SubTask(
 
 fun FocusSessionEntity.toDomain() = FocusSession(
     id = id, linkedTaskId = linkedTaskId, durationMinutes = durationMinutes,
-    startTime = startTime, endTime = endTime, efficiencyPercent = efficiencyPercent,
+    startTime = startTime, endTime = endTime,
     breakDurationMinutes = breakDurationMinutes, remoteId = remoteId, syncedAt = syncedAt
 )
 
@@ -44,9 +46,11 @@ fun User.toEntity() = UserEntity(
 fun Task.toEntity() = TaskEntity(
     id = id, title = title, description = description, category = category,
     priority = priority.name,
+    difficulty = difficulty.name,
     dueDate = dueDate, dueTime = dueTime,
     isCompleted = isCompleted, progressPercent = progressPercent,
-    studyNotes = studyNotes, remoteId = remoteId, syncedAt = syncedAt, userId = userId
+    studyNotes = studyNotes, remoteId = remoteId, syncedAt = syncedAt, userId = userId,
+    completedAt = completedAt, focusDuration = focusDuration
 )
 
 fun SubTask.toEntity() = SubTaskEntity(
@@ -56,7 +60,7 @@ fun SubTask.toEntity() = SubTaskEntity(
 
 fun FocusSession.toEntity() = FocusSessionEntity(
     id = id, linkedTaskId = linkedTaskId, durationMinutes = durationMinutes,
-    startTime = startTime, endTime = endTime, efficiencyPercent = efficiencyPercent,
+    startTime = startTime, endTime = endTime,
     breakDurationMinutes = breakDurationMinutes, remoteId = remoteId, syncedAt = syncedAt
 )
 
@@ -71,11 +75,13 @@ fun TaskDto.toDomain() = Task(
     id = 0, title = title, description = description ?: "",
     category = category,
     priority = Priority.valueOf(priority),
+    difficulty = Difficulty.valueOf(difficulty),
     dueDate = dueDate, dueTime = dueTime,
     isCompleted = isCompleted, progressPercent = progressPercent,
     studyNotes = studyNotes ?: "",
     remoteId = id,
-    subTasks = subTasks?.map { it.toDomain() } ?: emptyList()
+    subTasks = subTasks?.map { it.toDomain() } ?: emptyList(),
+    completedAt = null, focusDuration = 25
 )
 
 fun SubTaskDto.toDomain() = SubTask(

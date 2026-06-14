@@ -30,8 +30,8 @@ interface TaskDao {
     suspend fun deleteTask(id: Int)
 
     // ── Extras ───────────────────────────────────────────────────────────────
-    @Query("UPDATE tasks SET is_completed = :isCompleted, progress_percent = CASE WHEN :isCompleted = 1 THEN 100 ELSE 0 END WHERE id = :id")
-    suspend fun toggleTaskComplete(id: Int, isCompleted: Boolean)
+    @Query("UPDATE tasks SET is_completed = :isCompleted, completed_at = :completedAt, progress_percent = CASE WHEN :isCompleted = 1 THEN 100 ELSE 0 END WHERE id = :id")
+    suspend fun toggleTaskComplete(id: Int, isCompleted: Boolean, completedAt: Long?)
 
     @Query("SELECT * FROM tasks WHERE title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' ORDER BY due_date ASC")
     fun searchTasks(query: String): Flow<List<TaskEntity>>
@@ -42,28 +42,13 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE due_date >= :startOfDay AND due_date < :endOfDay ORDER BY due_date ASC")
     fun getTodayTasks(startOfDay: Long, endOfDay: Long): Flow<List<TaskEntity>>
 
-    @Query("""
-        SELECT t.* FROM tasks t
-        WHERE t.is_completed = 1
-          AND EXISTS (
-              SELECT 1 FROM focus_sessions fs
-              WHERE fs.linked_task_id = t.id
-                AND fs.end_time >= :startOfDay
-                AND fs.end_time < :endOfDay
-          )
-        ORDER BY (
-            SELECT MAX(fs2.end_time) FROM focus_sessions fs2
-            WHERE fs2.linked_task_id = t.id
-              AND fs2.end_time >= :startOfDay
-              AND fs2.end_time < :endOfDay
-        ) DESC
-    """)
+    @Query("SELECT * FROM tasks WHERE is_completed = 1 AND completed_at >= :startOfDay AND completed_at < :endOfDay ORDER BY completed_at DESC")
     fun getCompletedTodayTasks(startOfDay: Long, endOfDay: Long): Flow<List<TaskEntity>>
 
     @Query("SELECT COUNT(*) FROM tasks WHERE user_id = :userId")
     suspend fun getTaskCountForUser(userId: Int): Int
 
-    @Query("SELECT COUNT(*) FROM tasks WHERE is_completed = 1 AND due_date >= :startOfDay AND due_date < :endOfDay")
+    @Query("SELECT COUNT(*) FROM tasks WHERE is_completed = 1 AND completed_at >= :startOfDay AND completed_at < :endOfDay")
     fun getCompletedTodayCount(startOfDay: Long, endOfDay: Long): Flow<Int>
 
     @Query("SELECT COUNT(*) FROM tasks WHERE is_completed = 0")

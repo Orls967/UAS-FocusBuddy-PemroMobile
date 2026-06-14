@@ -155,16 +155,39 @@ fun DashboardScreen(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                 elevation = CardDefaults.cardElevation(1.dp)
             ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text("99", style = MaterialTheme.typography.labelLarge.copy(fontSize = 20.sp), color = MaterialTheme.colorScheme.secondary)
-                    Spacer(Modifier.height(4.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(16.dp)
+                ) {
                     Text(
-                        text = "\"${uiState.quote.content}\"",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
-                        color = MaterialTheme.colorScheme.onBackground
+                        text = "“",
+                        style = MaterialTheme.typography.labelLarge.copy(fontSize = 28.sp),
+                        color = MaterialTheme.colorScheme.secondary
                     )
-                    Spacer(Modifier.height(6.dp))
-                    Text("— ${uiState.quote.author}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "\"${uiState.quote.content}\"",
+                            style = MaterialTheme.typography.titleMedium.copy(fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 26.sp),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            maxLines = 3,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                    }
+                    Text(
+                        text = "— ${uiState.quote.author}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.align(Alignment.End)
+                    )
                 }
             }
 
