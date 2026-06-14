@@ -404,7 +404,7 @@ data/remote/api/QuoteApiService.kt
 Endpoint:
 
 ```text
-GET random?tags=inspirational,study
+ @GET("quotes/random")
 ```
 
 QuoteApiService tersedia untuk integrasi Quotable API, tetapi pada implementasi saat ini belum dipanggil oleh QuoteRepositoryImpl. Quote yang tampil di aplikasi diambil dari daftar quote lokal secara random.
